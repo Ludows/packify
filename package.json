@@ -1,0 +1,24 @@
+{
+  "name": "@ludoows/packify",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./test.js",
+    "compile": "node ./cli/init.js --options={} --config='' "
+  },
+  "author": "Ludoows",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/parser": "^7.9.2",
+    "@babel/traverse": "^7.9.0",
+    "axios": "^0.19.2",
+    "deepmerge": "^4.2.2",
+    "events": "^3.1.0",
+    "fs": "0.0.1-security",
+    "minimist": "^1.2.5",
+    "path": "^0.12.7",
+    "resolve": "^1.15.1"
+  }
+}
