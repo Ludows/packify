@@ -17,6 +17,7 @@
     "fs": "0.0.1-security",
     "minimist": "^1.2.5",
     "path": "^0.12.7",
-    "resolve": "^1.15.1"
+    "resolve": "^1.15.1",
+    "cross-env": "^7.0.2"
   }
 }
