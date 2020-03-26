@@ -4,6 +4,8 @@ const { getPath } = require('../libs/helpers');
 
 const fs = require('fs');
 
+console.log('getPath', getPath('package.json'))
+
 let scriptsCommands = {
     'packify:dev': 'cross-env NODE_ENV=development node_modules/@ludoows/packify/cli/init.js --config=node_modules/@ludoows/packify/configs/packify.js',
     'packify:prod': 'cross-env NODE_ENV=production node_modules/@ludoows/packify/cli/init.js --config=node_modules/@ludoows/packify/configs/packify.js',
