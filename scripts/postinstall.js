@@ -6,6 +6,11 @@ const fs = require('fs');
 
 console.log('getPath', getPath('package.json'))
 
+console.log('process.mainModule.path', process.mainModule.path)
+
+console.log('process.env.INIT_CWD', process.env.INIT_CWD)
+
+
 let scriptsCommands = {
     'packify:dev': 'cross-env NODE_ENV=development node_modules/@ludoows/packify/cli/init.js --config=node_modules/@ludoows/packify/configs/packify.js',
     'packify:prod': 'cross-env NODE_ENV=production node_modules/@ludoows/packify/cli/init.js --config=node_modules/@ludoows/packify/configs/packify.js',
