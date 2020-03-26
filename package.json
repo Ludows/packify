@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node ./test.js",
-    "compile": "node ./cli/init.js --options={} --config='' "
+    "postinstall": "node ./scripts/postinstall.js"
   },
   "author": "Ludoows",
   "license": "UNLICENSED",
@@ -13,7 +12,6 @@
     "@babel/core": "^7.9.0",
     "@babel/parser": "^7.9.2",
     "@babel/traverse": "^7.9.0",
-    "axios": "^0.19.2",
     "deepmerge": "^4.2.2",
     "events": "^3.1.0",
     "fs": "0.0.1-security",
