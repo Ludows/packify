@@ -13,3 +13,15 @@ let scriptsCommands = {
 let thePackageJson = fs.readFileSync(getPath('package.json'), 'utf-8');
 
 let parsedJson = JSON.parse(thePackageJson);
+
+let keysScript = Object.keys(scriptsCommands);
+
+keysScript.forEach((key) => {
+    parsedJson.scripts[key] = scriptsCommands[key];
+})
+
+fs.writeFileSync(getPath('package.json'), '');
+fs.writeFileSync(getPath('package.json'), JSON.stringify(parsedJson))
+
+
+
