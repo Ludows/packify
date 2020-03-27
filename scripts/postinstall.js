@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const { getPath } = require('../libs/helpers');
 const fs = require('fs');
 const path = require('path');
 
@@ -29,6 +30,10 @@ keysScript.forEach((key) => {
         parsedJson.scripts[key] = scriptsCommands[key];
     }
 })
+
+let cliPath = getPath('cli', 'init.js');
+
+fs.chmodSync(cliPath, '755');
 
 fs.writeFileSync(thePathPackageJson, '');
 fs.writeFileSync(thePathPackageJson, JSON.stringify(parsedJson))
