@@ -27,10 +27,25 @@ function getEventManager() {
     return eventEmitter;
 }
 
+function parseFile(...args) {
+    return JSON.parse(fs.readFileSync(...args));
+}
+
+function requireFile(...args) {
+    return require(...args);
+}
+
+function makeError(...args) {
+    console.log('...args', ...args)
+}
+
 module.exports = {
     mergeConfig,
     getPath,
     getBasePath,
     formatPath,
-    getEventManager
+    getEventManager,
+    parseFile, 
+    requireFile,
+    makeError
 }
