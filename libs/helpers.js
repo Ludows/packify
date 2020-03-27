@@ -3,6 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const events = require('events');
 const eventEmitter = new events.EventEmitter();
+const PrettyError = require('pretty-error');
+const pe = new PrettyError();
 
 
 const basePackifyConfig = require('../configs/packify');
@@ -13,6 +15,10 @@ function mergeConfig(opts) {
 
 function getPath(...args) {
     return path.join(getBasePath(), ...args);
+}
+
+function typeOf(...args) {
+    return ({}).toString.call(...args).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
 }
 
 function getBasePath() {
@@ -36,7 +42,8 @@ function requireFile(...args) {
 }
 
 function makeError(...args) {
-    console.log('...args', ...args)
+    var renderedError = pe.render(new Error(...args));
+    console.log(renderedError);
 }
 
 module.exports = {
@@ -47,5 +54,6 @@ module.exports = {
     getEventManager,
     parseFile, 
     requireFile,
-    makeError
+    makeError,
+    typeOf
 }

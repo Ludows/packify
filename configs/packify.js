@@ -6,7 +6,11 @@ const BasePackifyConfig = {
     },
     loaders: [
         ['babel-loader', {}]
-    ]
+    ],
+    resolvers: {
+        configs: [],
+        loaders: []
+    }
 }
 
 module.exports = BasePackifyConfig;
