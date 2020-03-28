@@ -7,6 +7,12 @@ const BasePackifyConfig = {
     loaders: [
         ['babel-loader', {}]
     ],
+    excludes: {
+        prefix: '_'
+    },
+    alias: {
+        '~': 'node_modules'
+    },
     resolvers: {
         configs: [],
         loaders: []

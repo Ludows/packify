@@ -46,6 +46,22 @@ function makeError(...args) {
     console.log(renderedError);
 }
 
+function walker(...args) {
+
+}
+
+function getFileType(...args) {
+    return path.extname(...args).substr(1);
+}
+
+function getFileName(...args) {
+    return path.basename(...args)
+}
+
+function getDirectory(...args) {
+    return path.dirname(...args)
+}
+
 module.exports = {
     mergeConfig,
     getPath,
@@ -55,5 +71,9 @@ module.exports = {
     parseFile, 
     requireFile,
     makeError,
-    typeOf
+    typeOf,
+    walker,
+    getFileType,
+    getFileName,
+    getDirectory
 }

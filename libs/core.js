@@ -14,11 +14,35 @@ class Core {
    this.options[key] = value;
     return this;
  }
+ register(key, options) {
+
+ }
  $init() {
    this.eventManager.emit('packify:init');
 
-   let entryType = typeOf(this.get('entry'));
+   let entry = this.get('entry');
+   let entryType = typeOf(entry);
    console.log('entryType', entryType)
+
+   if(entryType === 'string') {
+     let formater = [];
+     formater.push(entry);
+     formater.forEach((entryString) => {
+
+     })
+   }
+   else if(entryType === 'array') {
+    entry.forEach((entryPoint) => {
+
+    })
+   }
+   else {
+    let keysEntry = Object.keys(entry);
+
+    keysEntry.forEach((entryObject) => {
+
+    })
+   }
 
  }
  start() {
