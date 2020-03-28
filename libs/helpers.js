@@ -62,6 +62,10 @@ function getDirectory(...args) {
     return path.dirname(...args)
 }
 
+function getListingDir(pathFile, FileTypesOpt = false) {
+    return fs.readdirSync(pathFile, {withFileTypes: FileTypesOpt});
+}
+
 module.exports = {
     mergeConfig,
     getPath,
@@ -75,5 +79,6 @@ module.exports = {
     walker,
     getFileType,
     getFileName,
-    getDirectory
+    getDirectory,
+    getListingDir
 }
