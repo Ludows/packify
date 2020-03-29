@@ -5,7 +5,7 @@ const BasePackifyConfig = {
         filename: '[name].[hash].[extension]'
     },
     plugins: [
-        ['babel-loader', {
+        ['babel-plugin', {
             presets: ['env']
         }]
     ],
