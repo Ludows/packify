@@ -5,11 +5,12 @@ const BasePackifyConfig = {
         filename: '[name].[hash].[extension]'
     },
     plugins: [
-        ['babel-loader', {}]
+        ['babel-loader', {
+            presets: ['env']
+        }]
     ],
     excludes: {
         prefix: '_',
-        parsing:[]
     },
     alias: {
         '~': 'node_modules'

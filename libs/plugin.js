@@ -6,13 +6,6 @@ class BasePlugin {
     extensions() {
         return [];
     }
-    getAst() {
-        let parser = this.getParser();
-        let ast = parser.parse()
-    }
-    transform() {
-
-    }
     run(compilerInstance) {
 
     }
