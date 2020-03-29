@@ -34,7 +34,7 @@ class Core {
       ...resolvers.plugins
     ]
 
-    this.set('registeredPathLoaders', allLoadersPath);
+    this.set('registeredPathLoaders', allPluginsPath);
 
     // console.log('allLoadersPath', allLoadersPath);
 
