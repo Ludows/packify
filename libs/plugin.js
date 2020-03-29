@@ -3,14 +3,18 @@ class BasePlugin {
         this.name = name;
         this.options = opts;
     }
-    getExtensions() {
+    extensions() {
         return [];
     }
-    transform(compilerInstance) {
+    getAst() {
+        let parser = this.getParser();
+        let ast = parser.parse()
+    }
+    transform() {
 
     }
-    run() {
-        
+    run(compilerInstance) {
+
     }
 }
-module.exports = BaseLoader;
+module.exports = BasePlugin;

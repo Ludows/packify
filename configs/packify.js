@@ -8,14 +8,15 @@ const BasePackifyConfig = {
         ['babel-loader', {}]
     ],
     excludes: {
-        prefix: '_'
+        prefix: '_',
+        parsing:[]
     },
     alias: {
         '~': 'node_modules'
     },
     resolvers: {
         configs: [],
-        loaders: []
+        plugins: []
     }
 }
 

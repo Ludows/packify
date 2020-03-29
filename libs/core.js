@@ -4,6 +4,7 @@ const {
   typeOf,
   requireFile,
   getListingDir,
+  makeError,
   getPath
 } = require('./helpers');
 
@@ -20,28 +21,36 @@ class Core {
     this.options[key] = value;
     return this;
   }
-  register(key, options) {
-
-  }
-  manageLoaders() {
-    let allLoadersPath = [];
+  managePlugins() {
+    let allPluginsPath = [];
     let resolvers = this.get('resolvers');
     
-    let Baseloaders = getPath('node_modules', '@ludoows', 'packify', 'loaders');
+    let BasePlugins = getPath('node_modules', '@ludoows', 'packify', 'plugins');
 
-    let loaders = this.get('loaders');
+    let plugins = this.get('plugins');
 
-    allLoadersPath = [
-      Baseloaders,
-      ...resolvers.loaders
+    allPluginsPath = [
+      BasePlugins,
+      ...resolvers.plugins
     ]
 
     this.set('registeredPathLoaders', allLoadersPath);
 
-    console.log('allLoadersPath', allLoadersPath);
+    // console.log('allLoadersPath', allLoadersPath);
 
-    loaders.forEach((loader) => {
-      let urlLoader = this.dependencyResolver(loader[1], allLoadersPath);
+    plugins.forEach((plugin) => {
+      let urlPlugin = this.dependencyResolver(plugin[0], allPluginsPath);
+
+      if(urlPlugin != null) {
+        let requiredPlugin = new ( requireFile(urlPlugin) )(plugin[0], plugin[1]);
+
+        requiredPlugin.run(this);
+      }
+      else {
+        makeError('the specified plugin '+ plugin[0] +' was not found');
+      }
+
+      
     })
   }
   dependencyResolver(nameFile, arrayOfSources) {
@@ -88,7 +97,7 @@ class Core {
 
   }
   start() {
-    this.manageLoaders();
+    this.managePlugins();
     this.$init();
   }
 }
