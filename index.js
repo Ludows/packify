@@ -1,4 +1,5 @@
 module.exports = {
     packify: require('./libs/core'),
-    helpers: require('./libs/helpers')
+    helpers: require('./libs/helpers'),
+    plugin: require('./libs/plugin')
 }

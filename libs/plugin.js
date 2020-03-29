@@ -1,10 +1,16 @@
-class BaseLoader {
+class BasePlugin {
     constructor(name, opts) {
         this.name = name;
         this.options = opts;
     }
-    run(compilerInstance) {
+    getExtensions() {
+        return [];
+    }
+    transform(compilerInstance) {
 
+    }
+    run() {
+        
     }
 }
 module.exports = BaseLoader;
