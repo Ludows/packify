@@ -5,7 +5,8 @@ const {
   requireFile,
   getListingDir,
   makeError,
-  getPath
+  getPath,
+  formatPath
 } = require('./helpers');
 
 class Core {
@@ -37,33 +38,39 @@ class Core {
     this.set('registeredPathLoaders', allPluginsPath);
 
     // console.log('allLoadersPath', allLoadersPath);
+    let pluginsInitialized = [];
 
     plugins.forEach((plugin) => {
       console.log('plugin', plugin)
-      let urlPlugin = this.dependencyResolver(plugin[0], allPluginsPath);
-      console.log('urlPlugin', urlPlugin);
+      let urlPlugin = this.dependencyResolver(plugin[0]+'js', allPluginsPath);
+      // console.log('urlPlugin', urlPlugin);
+
+      
 
       if(urlPlugin != null) {
         let requiredPlugin = new ( requireFile(urlPlugin) )(plugin[0], plugin[1]);
 
         requiredPlugin.run(this);
+
+        pluginsInitialized.push(requiredPlugin);
+
       }
       else {
         makeError('the specified plugin '+ plugin[0] +' was not found');
+        process.exit();
       }
-
-      
     })
+    this.set('pluginsInitialized', pluginsInitialized);
   }
   dependencyResolver(nameFile, arrayOfSources) {
     let ret = null;
     for (let index = 0; index < arrayOfSources.length; index++) {
       const source = arrayOfSources[index];
       let files = getListingDir(source, false)
-      console.log('files dependencyResolver', files)
+      // console.log('files dependencyResolver', files)
 
       if(files.indexOf(nameFile) > -1) {
-        ret = getPath(source, nameFile+'.js');
+        ret = formatPath(source, nameFile);
         break;
       }
 
