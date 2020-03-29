@@ -39,7 +39,9 @@ class Core {
     // console.log('allLoadersPath', allLoadersPath);
 
     plugins.forEach((plugin) => {
+      console.log('plugin', plugin)
       let urlPlugin = this.dependencyResolver(plugin[0], allPluginsPath);
+      console.log('urlPlugin', urlPlugin);
 
       if(urlPlugin != null) {
         let requiredPlugin = new ( requireFile(urlPlugin) )(plugin[0], plugin[1]);
