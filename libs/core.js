@@ -42,7 +42,7 @@ class Core {
 
     plugins.forEach((plugin) => {
       console.log('plugin', plugin)
-      let urlPlugin = this.dependencyResolver(plugin[0]+'js', allPluginsPath);
+      let urlPlugin = this.dependencyResolver(plugin[0]+'.js', allPluginsPath);
       // console.log('urlPlugin', urlPlugin);
 
       
