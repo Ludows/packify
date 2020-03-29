@@ -8,7 +8,7 @@ class BabelPlugin extends PluginBase {
         return ['js']
     }
     run(compiler) {
-        console.log('compiler', compiler)
+        
     }
 }
 

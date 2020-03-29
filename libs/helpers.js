@@ -50,6 +50,10 @@ function walker(...args) {
 
 }
 
+function unique(array) {
+    return array.filter((x, i, a) => a.indexOf(x) == i)
+}
+
 function getFileType(...args) {
     return path.extname(...args).substr(1);
 }
@@ -80,5 +84,6 @@ module.exports = {
     getFileType,
     getFileName,
     getDirectory,
+    unique,
     getListingDir
 }

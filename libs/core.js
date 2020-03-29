@@ -6,7 +6,8 @@ const {
   getListingDir,
   makeError,
   getPath,
-  formatPath
+  formatPath,
+  unique
 } = require('./helpers');
 
 class Core {
@@ -41,7 +42,7 @@ class Core {
     let pluginsInitialized = [];
 
     plugins.forEach((plugin) => {
-      console.log('plugin', plugin)
+      // console.log('plugin', plugin)
       let urlPlugin = this.dependencyResolver(plugin[0]+'.js', allPluginsPath);
       // console.log('urlPlugin', urlPlugin);
 
@@ -49,6 +50,17 @@ class Core {
 
       if(urlPlugin != null) {
         let requiredPlugin = new ( requireFile(urlPlugin) )(plugin[0], plugin[1]);
+
+        let extensions = this.get('extensionsTriggered');
+
+        let ExtensionBindedByPlugin = requiredPlugin.extensions()
+
+        if(ExtensionBindedByPlugin.length === 0) {
+          makeError('Avez vous défini une liste des extensions que votre plugin '+ plugin[0] +' peut transformer ?');
+          process.exit();
+        }
+
+        this.set('extensionsTriggered', unique(requiredPlugin.extensions()))
 
         requiredPlugin.run(this);
 
@@ -81,6 +93,7 @@ class Core {
   }
   $init() {
     this.eventManager.emit('packify:init');
+   
 
     let entry = this.get('entry');
     let entryType = typeOf(entry);
@@ -90,22 +103,23 @@ class Core {
       let formater = [];
       formater.push(entry);
       formater.forEach((entryString) => {
-
+        this.eventManager.emit('packify:eachEntry', entryString);
       })
     } else if (entryType === 'array') {
       entry.forEach((entryPoint) => {
-
+        this.eventManager.emit('packify:eachEntry', entryPoint);
       })
     } else {
       let keysEntry = Object.keys(entry);
 
       keysEntry.forEach((entryObject) => {
-
+        this.eventManager.emit('packify:eachEntry', keysEntry[entryObject]);
       })
     }
 
   }
   start() {
+    this.set('extensionsTriggered', []);
     this.managePlugins();
     this.$init();
   }
