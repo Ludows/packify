@@ -4,7 +4,7 @@ const BasePackifyConfig = {
         path: '',
         filename: '[name].[hash].[extension]'
     },
-    loaders: [
+    plugins: [
         ['babel-loader', {}]
     ],
     excludes: {
