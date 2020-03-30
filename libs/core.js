@@ -7,7 +7,8 @@ const {
   makeError,
   getPath,
   formatPath,
-  unique
+  unique,
+  readFileSync,
 } = require('./helpers');
 
 class Core {
@@ -97,23 +98,33 @@ class Core {
 
     let entry = this.get('entry');
     let entryType = typeOf(entry);
-    console.log('entryType', entryType)
+    // console.log('entryType', entryType)
 
     if (entryType === 'string') {
       let formater = [];
       formater.push(entry);
       formater.forEach((entryString) => {
         this.eventManager.emit('packify:eachEntry', entryString);
+        
+        this.eventManager.emit('packify:readContent', readFileSync(entryString));
+
       })
     } else if (entryType === 'array') {
       entry.forEach((entryPoint) => {
         this.eventManager.emit('packify:eachEntry', entryPoint);
+
+        this.eventManager.emit('packify:readContent', readFileSync(entryPoint));
+
       })
     } else {
       let keysEntry = Object.keys(entry);
 
       keysEntry.forEach((entryObject) => {
+        
         this.eventManager.emit('packify:eachEntry', keysEntry[entryObject]);
+
+        this.eventManager.emit('packify:readContent', keysEntry[entryObject]);
+        
       })
     }
 

@@ -54,6 +54,10 @@ function unique(array) {
     return array.filter((x, i, a) => a.indexOf(x) == i)
 }
 
+function readFileSync(url) {
+    return fs.readFileSync(url);
+}
+
 function getFileType(...args) {
     return path.extname(...args).substr(1);
 }
@@ -85,5 +89,6 @@ module.exports = {
     getFileName,
     getDirectory,
     unique,
-    getListingDir
+    getListingDir,
+    readFileSync
 }
