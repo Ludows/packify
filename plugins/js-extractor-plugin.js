@@ -1,13 +1,18 @@
 const PluginBase = require('../libs/plugin');
 const {
-    getEventManager
+    getEventManager,
+    formatPath,
+    getBasePath,
+    getFileName,
+    getFileType,
+    getListingDir
 } = require('../libs/helpers')
 
 const parser = require("@babel/parser"); // parses and returns AST
 const traverse = require("@babel/traverse").default; // walks through AST
 const babel = require("@babel/core"); // main babel functionality
 
-class BabelPlugin extends PluginBase {
+class JsExtractorPlugin extends PluginBase {
     constructor(name, opts) {
         super(name, opts)
         this.ID = 0;
@@ -15,14 +20,30 @@ class BabelPlugin extends PluginBase {
     extensions() {
         return ['js']
     }
+    formatDestPath(srcUrl, destUrl) {
+
+        let dirs = getListingDir(process.cwd());
+
+        console.log('dirs');
+    }
     run(compiler) {
         let eventManager = getEventManager();
 
-        eventManager.on('packify:readContent', (content) => {
-            console.log('content', content)
+        eventManager.on('packify:eachEntry', (entry) => {
+            console.log('entry', entry)
             // this.createModuleInfo(content);
             let graph = this.createGraph(entry);
             let bundle = this.bundle(graph);
+
+            let file = {
+                src: entry,
+                destPath: this.formatDestPath(entry, compiler.options.output.path),
+                name: getFileName(entry),
+                extension: getFileType(entry),
+                content: bundle
+            }
+
+            compiler.queue(file);
         })
     }
     createAsset(filename) {
@@ -102,4 +123,4 @@ class BabelPlugin extends PluginBase {
     }
 }
 
-module.exports = BabelPlugin;
+module.exports = JsExtractorPlugin;

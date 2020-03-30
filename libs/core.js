@@ -9,13 +9,50 @@ const {
   formatPath,
   unique,
   readFileSync,
+  getFileType
 } = require('./helpers');
 
 class Core {
   constructor(opts) {
     this.options = mergeConfig(opts);
     this.eventManager = getEventManager();
+    this.Queue = [];
     this.start();
+  }
+  queue(file) {
+    
+    if(!file) {
+      makeError('need file to process to queue management')
+      process.exit();
+    }
+
+    if(this.isInQueue(file)) {
+
+    }
+    else {
+      // Todo cas de l'update
+    }
+
+  }
+  isInQueue(fileObject) {
+    let ret = false;
+    for (let index = 0; index < this.Queue.length; index++) {
+      const file = this.Queue[index];
+      if(file.src === fileObject.src) {
+        ret = true
+        break;
+      }
+    }
+    return ret;
+  }
+  canBeProcessed(extension) {
+    let ret = false;
+    let extensions = this.get('extensionsTriggered');
+
+    if(extensions.indexOf(extension) > -1) {
+      ret = true;
+    }
+    return ret;
   }
   get(key) {
     return this.options[key]
@@ -101,31 +138,39 @@ class Core {
     // console.log('entryType', entryType)
 
     if (entryType === 'string') {
+
       let formater = [];
       formater.push(entry);
       formater.forEach((entryString) => {
+        let canBeProcessed = this.canBeProcessed(entryString);
+        let fileTypeError = getFileType(entryString);
+        if(!canBeProcessed) {
+          makeError('le type '+ fileTypeError + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
+          process.exit();
+        }
         this.eventManager.emit('packify:eachEntry', entryString);
         
         this.eventManager.emit('packify:readContent', readFileSync(entryString));
 
       })
-    } else if (entryType === 'array') {
+
+    } else {
+
       entry.forEach((entryPoint) => {
+
+        let canBeProcessed = this.canBeProcessed(entryPoint);
+        let fileTypeError = getFileType(entryPoint);
+        if(!canBeProcessed) {
+          makeError('le type '+ fileTypeError + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
+          process.exit();
+        }
+
         this.eventManager.emit('packify:eachEntry', entryPoint);
 
         this.eventManager.emit('packify:readContent', readFileSync(entryPoint));
 
       })
-    } else {
-      let keysEntry = Object.keys(entry);
 
-      keysEntry.forEach((entryObject) => {
-        
-        this.eventManager.emit('packify:eachEntry', keysEntry[entryObject]);
-
-        this.eventManager.emit('packify:readContent', keysEntry[entryObject]);
-        
-      })
     }
 
   }

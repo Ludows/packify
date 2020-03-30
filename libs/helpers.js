@@ -74,6 +74,10 @@ function getListingDir(pathFile, FileTypesOpt = false) {
     return fs.readdirSync(pathFile, {withFileTypes: FileTypesOpt});
 }
 
+function getEntries() {
+
+}
+
 module.exports = {
     mergeConfig,
     getPath,
@@ -90,5 +94,6 @@ module.exports = {
     getDirectory,
     unique,
     getListingDir,
-    readFileSync
+    readFileSync,
+    getEntries
 }

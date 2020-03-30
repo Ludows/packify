@@ -1,17 +1,15 @@
+const { getPath, getEntries } = require('../libs/helpers')
 const BasePackifyConfig = {
-    entry: '', // or [] or {},
+    entry: getEntries(), // or []
     output: {
-        path: '',
-        filename: '[name].[hash].[extension]'
+        path: getPath('public'),
+        hash: true
     },
     plugins: [
-        ['babel-plugin', {
+        ['js-extractor-plugin', {
             presets: ['env']
         }]
     ],
-    excludes: {
-        prefix: '_',
-    },
     alias: {
         '~': 'node_modules'
     },
