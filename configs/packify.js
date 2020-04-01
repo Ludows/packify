@@ -1,6 +1,7 @@
 const { getPath, getEntries } = require('../libs/helpers')
+
 const BasePackifyConfig = {
-    entry: getEntries(), // or []
+    entry: '', // or []
     output: {
         path: getPath('public'),
         hash: true

@@ -19,6 +19,12 @@ class Core {
     this.Queue = [];
     this.start();
   }
+  static entry(pathEntry) {
+    if(typeOf(pathEntry) === "object") {
+      makeError('Oops ! Il semblerait qu\' il y ait une erreur. Packify ne supporte actuellement que ces types pour ces entrées : <Array> or <String>');
+      process.exit();
+    }
+  }
   queue(file) {
     
     if(!file) {

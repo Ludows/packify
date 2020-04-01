@@ -5,6 +5,7 @@ const events = require('events');
 const eventEmitter = new events.EventEmitter();
 const PrettyError = require('pretty-error');
 const pe = new PrettyError();
+const vm = require('vm');
 
 
 const basePackifyConfig = require('../configs/packify');
@@ -43,7 +44,7 @@ function requireFile(...args) {
 
 function makeError(...args) {
     var renderedError = pe.render(new Error(...args));
-    console.log(renderedError);
+    // console.log(renderedError);
 }
 
 function walker(...args) {
@@ -75,6 +76,18 @@ function getListingDir(pathFile, FileTypesOpt = false) {
 }
 
 function getEntries() {
+    let filePackifyExist = fs.existsSync(getPath('packify.config.js'))
+    let contentFile = undefined;
+    // si le user veut custom la config. Son fichier sera pris en compte.
+    // sinon c'est ma configuration qui prendra le relais
+    if(filePackifyExist) {
+        contentFile = readFileSync(getPath('packify.config.js'));
+    }
+    else {
+        contentFile = readFileSync(getPath('node_modules', '@ludoows', 'packify', 'packify.config.js'));
+    }
+
+    // const contextifiedObject = vm.createContext(contentFile);
 
 }
 

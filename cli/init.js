@@ -3,7 +3,9 @@
 const {
     getPath,
     requireFile,
-    makeError
+    makeError,
+    getEntries,
+    mergeConfig
 } = require('../libs/helpers');
 
 const Core = require('../libs/core');
@@ -14,6 +16,8 @@ const argv = require('minimist')(process.argv.slice(2));
 if (argv.config == undefined || argv.config.length === 0) {
     makeError('Une Configuration est nécessaire pour packify');
 }
+
+let entries = getEntries();
 
 let options = requireFile(getPath(argv.config));
 
