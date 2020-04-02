@@ -32,8 +32,12 @@ keysScript.forEach((key) => {
 })
 
 let cliPath = getPath('cli', 'init.js');
+let baseOptionsExtendPath = getPath('configs', 'packify.config.js');
+
 
 fs.chmodSync(cliPath, '755');
+fs.chmodSync(baseOptionsExtendPath, '755');
+
 
 fs.writeFileSync(thePathPackageJson, '');
 fs.writeFileSync(thePathPackageJson, JSON.stringify(parsedJson))
