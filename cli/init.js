@@ -4,7 +4,7 @@ const {
     getPath,
     requireFile,
     makeError,
-    getEntries,
+    getExtendOption,
     mergeConfig
 } = require('../libs/helpers');
 
@@ -17,7 +17,7 @@ if (argv.config == undefined || argv.config.length === 0) {
     makeError('Une Configuration est nécessaire pour packify');
 }
 
-let entries = getEntries();
+let entries = getExtendOption();
 
 let options = requireFile(getPath(argv.config));
 

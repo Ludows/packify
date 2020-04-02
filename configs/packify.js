@@ -1,11 +1,7 @@
-const { getPath } = require('../libs/helpers')
-
-console.log('getPath', getPath)
-
 const BasePackifyConfig = {
     entry: '', // or []
     output: {
-        path: getPath('public'),
+        path: '',
         hash: true
     },
     plugins: [
