@@ -1,4 +1,6 @@
-const { getPath, getEntries } = require('../libs/helpers')
+const { getPath } = require('../libs/helpers')
+
+console.log('getPath', getPath)
 
 const BasePackifyConfig = {
     entry: '', // or []
