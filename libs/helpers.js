@@ -5,7 +5,7 @@ const events = require('events');
 const eventEmitter = new events.EventEmitter();
 const PrettyError = require('pretty-error');
 const pe = new PrettyError();
-const vm = require('vm');
+const { execSync } = require('child_process');
 
 
 const basePackifyConfig = require('../configs/packify');
@@ -77,18 +77,21 @@ function getListingDir(pathFile, FileTypesOpt = false) {
 
 function getEntries() {
     let filePackifyExist = fs.existsSync(getPath('packify.config.js'))
-    let contentFile = undefined;
+    let file = undefined;
     // si le user veut custom la config. Son fichier sera pris en compte.
     // sinon c'est ma configuration qui prendra le relais
     if(filePackifyExist) {
-        contentFile = readFileSync(getPath('packify.config.js'));
+        file = getPath('packify.config.js');
     }
     else {
-        contentFile = readFileSync(getPath('node_modules', '@ludoows', 'packify', 'packify.config.js'));
+        file = getPath('node_modules', '@ludoows', 'packify', 'packify.config.js');
     }
 
     // const contextifiedObject = vm.createContext(contentFile);
+    let result = execSync(`node ${file}`).toString();
+    console.log('result', result);
 
+    return result;
 }
 
 module.exports = {
