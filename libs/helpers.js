@@ -77,6 +77,7 @@ function getListingDir(pathFile, FileTypesOpt = false) {
 
 function getExtendOption() {
     let filePackifyExist = fs.existsSync(getPath('packify.config.js'))
+    console.log('filePackifyExist', filePackifyExist)
     let file = undefined;
     // si le user veut custom la config. Son fichier sera pris en compte.
     // sinon c'est ma configuration qui prendra le relais
