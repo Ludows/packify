@@ -20,7 +20,7 @@ class Core {
     this.start();
   }
   static entry(pathEntry) {
-    if(typeOf(pathEntry) === "object") {
+    if(typeOf(pathEntry) === "object" || typeOf(pathEntry) === "undefined") {
       makeError('Oops ! Il semblerait qu\' il y ait une erreur. Packify ne supporte actuellement que ces types pour ces entrées : <Array> or <String>');
       process.exit();
     }

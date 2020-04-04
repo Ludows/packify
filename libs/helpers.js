@@ -5,8 +5,6 @@ const events = require('events');
 const eventEmitter = new events.EventEmitter();
 const PrettyError = require('pretty-error');
 const pe = new PrettyError();
-const { execSync } = require('child_process');
-
 
 const basePackifyConfig = require('../configs/packify');
 
@@ -47,8 +45,31 @@ function makeError(...args) {
     // console.log(renderedError);
 }
 
-function walker(...args) {
+function walker(dir, filelist, recursive, extensions = []) {
+    var fs = fs || require('fs'),
+        files = fs.existsSync(dir) ? fs.readdirSync(dir) : [],
+        filelist = filelist || [];
+    let that = this;
+    files.forEach(function (file) {
+        if (recursive != undefined && recursive) {
+            if (fs.statSync(path.join(dir, file)).isDirectory()) {
+                filelist = that.walker(path.join(dir, file), filelist, true);
+            } else {
+                let extname = path.extname(file).substr(1);
+                if (extensions.indexOf(extname) > -1 && extensions.length > 0) {
+                    filelist.push(path.join(dir, file));
+                }
+            }
+        } else {
+            var full_path = path.join(dir, file);
+            let extname = path.extname(file).substr(1);
+            if (extensions.indexOf(extname) > -1 && extensions.length > 0) {
+                filelist.push(path.join(dir, file));
+            }
+        }
 
+    });
+    return filelist;
 }
 
 function unique(array) {
@@ -77,7 +98,9 @@ function getListingDir(pathFile, FileTypesOpt = false) {
 
 function getExtendOption() {
     let filePackifyExist = fs.existsSync(getPath('packify.config.js'))
-    console.log('filePackifyExist', filePackifyExist)
+    // console.log('getPath', getPath('packify.config.js'))
+    // console.log('filePackifyExist', filePackifyExist)
+    // console.log('filePackifyExist Compare', fs.existsSync(getPath('node_modules', '@ludoows', 'packify', 'configs', 'packify.config.js')))
     let file = undefined;
     // si le user veut custom la config. Son fichier sera pris en compte.
     // sinon c'est ma configuration qui prendra le relais
@@ -85,10 +108,10 @@ function getExtendOption() {
         file = getPath('packify.config.js');
     }
     else {
-        file = getPath('node_modules', '@ludoows', 'packify', 'packify.config.js');
+        file = getPath('node_modules', '@ludoows', 'packify', 'configs', 'packify.config.js');
     }
 
-    let result = execSync(`node ${file}`).toString();
+    let result = require(file)
     console.log('result', result);
 
     return result;
