@@ -49,11 +49,10 @@ function walker(dir, filelist, recursive, extensions = []) {
     var fs = fs || require('fs'),
         files = fs.existsSync(dir) ? fs.readdirSync(dir) : [],
         filelist = filelist || [];
-    let that = this;
     files.forEach(function (file) {
         if (recursive != undefined && recursive) {
             if (fs.statSync(path.join(dir, file)).isDirectory()) {
-                filelist = that.walker(path.join(dir, file), filelist, true);
+                filelist = walker(path.join(dir, file), filelist, recursive, extensions);
             } else {
                 let extname = path.extname(file).substr(1);
                 if (extensions.indexOf(extname) > -1 && extensions.length > 0) {
