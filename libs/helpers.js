@@ -12,6 +12,10 @@ function mergeConfig(opts) {
     return merge(basePackifyConfig, opts);
 }
 
+function mergeObjects(obj1, obj2) {
+    return merge(obj1, obj2);
+}
+
 function getPath(...args) {
     return path.join(getBasePath(), ...args);
 }
@@ -118,6 +122,7 @@ function getExtendOption() {
 
 module.exports = {
     mergeConfig,
+    mergeObjects,
     getPath,
     getBasePath,
     formatPath,

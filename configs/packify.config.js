@@ -1,7 +1,10 @@
 const Core = require('../libs/core');
 
 
-const { walker, getPath } = require('../libs/helpers');
+const {
+    walker,
+    getPath
+} = require('../libs/helpers');
 
 const folders = [
     getPath('resources'),
@@ -11,11 +14,13 @@ const folders = [
 let assets = [];
 
 folders.forEach((folder) => {
-    assets.concat(walker(folder, [], true, ['png', 'jpg', 'gif', 'css', 'js']));
+    let links = walker(folder, [], true, ['png', 'jpg', 'gif', 'css', 'js'])
+    // console.log('links', links)
+    assets = assets.concat(links);
 })
 
 const extendOptionsConfigurationFile = {
-    entry : Core.entry(assets)
+    entry: assets
 }
 
 

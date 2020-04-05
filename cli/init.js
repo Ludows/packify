@@ -5,7 +5,7 @@ const {
     requireFile,
     makeError,
     getExtendOption,
-    mergeConfig
+    mergeObjects
 } = require('../libs/helpers');
 
 const Core = require('../libs/core');
@@ -21,7 +21,7 @@ let entries = getExtendOption();
 
 let options = requireFile(getPath(argv.config));
 
-let packify = new Core(options);
+let packify = new Core(mergeObjects(options, entries));
 
 console.log('packify instance', packify)
 

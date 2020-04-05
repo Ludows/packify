@@ -20,22 +20,21 @@ class Core {
     this.start();
   }
   static entry(pathEntry) {
-    if(typeOf(pathEntry) === "object" || typeOf(pathEntry) === "undefined") {
+    if (typeOf(pathEntry) === "object" || typeOf(pathEntry) === "undefined") {
       makeError('Oops ! Il semblerait qu\' il y ait une erreur. Packify ne supporte actuellement que ces types pour ces entrées : <Array> or <String>');
       process.exit();
     }
   }
   queue(file) {
-    
-    if(!file) {
+
+    if (!file) {
       makeError('need file to process to queue management')
       process.exit();
     }
 
-    if(this.isInQueue(file)) {
+    if (this.isInQueue(file)) {
 
-    }
-    else {
+    } else {
       // Todo cas de l'update
     }
 
@@ -44,7 +43,7 @@ class Core {
     let ret = false;
     for (let index = 0; index < this.Queue.length; index++) {
       const file = this.Queue[index];
-      if(file.src === fileObject.src) {
+      if (file.src === fileObject.src) {
         ret = true
         break;
       }
@@ -55,7 +54,7 @@ class Core {
     let ret = false;
     let extensions = this.get('extensionsTriggered');
 
-    if(extensions.indexOf(extension) > -1) {
+    if (extensions.indexOf(extension) > -1) {
       ret = true;
     }
     return ret;
@@ -70,7 +69,7 @@ class Core {
   managePlugins() {
     let allPluginsPath = [];
     let resolvers = this.get('resolvers');
-    
+
     let BasePlugins = getPath('node_modules', '@ludoows', 'packify', 'plugins');
 
     let plugins = this.get('plugins');
@@ -87,20 +86,20 @@ class Core {
 
     plugins.forEach((plugin) => {
       // console.log('plugin', plugin)
-      let urlPlugin = this.dependencyResolver(plugin[0]+'.js', allPluginsPath);
+      let urlPlugin = this.dependencyResolver(plugin[0] + '.js', allPluginsPath);
       // console.log('urlPlugin', urlPlugin);
 
-      
 
-      if(urlPlugin != null) {
-        let requiredPlugin = new ( requireFile(urlPlugin) )(plugin[0], plugin[1]);
+
+      if (urlPlugin != null) {
+        let requiredPlugin = new(requireFile(urlPlugin))(plugin[0], plugin[1]);
 
         let extensions = this.get('extensionsTriggered');
 
         let ExtensionBindedByPlugin = requiredPlugin.extensions()
 
-        if(ExtensionBindedByPlugin.length === 0) {
-          makeError('Avez vous défini une liste des extensions que votre plugin '+ plugin[0] +' peut transformer ?');
+        if (ExtensionBindedByPlugin.length === 0) {
+          makeError('Avez vous défini une liste des extensions que votre plugin ' + plugin[0] + ' peut transformer ?');
           process.exit();
         }
 
@@ -110,9 +109,8 @@ class Core {
 
         pluginsInitialized.push(requiredPlugin);
 
-      }
-      else {
-        makeError('the specified plugin '+ plugin[0] +' was not found');
+      } else {
+        makeError('the specified plugin ' + plugin[0] + ' was not found');
         process.exit();
       }
     })
@@ -125,7 +123,7 @@ class Core {
       let files = getListingDir(source, false)
       // console.log('files dependencyResolver', files)
 
-      if(files.indexOf(nameFile) > -1) {
+      if (files.indexOf(nameFile) > -1) {
         ret = formatPath(source, nameFile);
         break;
       }
@@ -137,7 +135,7 @@ class Core {
   }
   $init() {
     this.eventManager.emit('packify:init');
-   
+
 
     let entry = this.get('entry');
     let entryType = typeOf(entry);
@@ -150,12 +148,12 @@ class Core {
       formater.forEach((entryString) => {
         let canBeProcessed = this.canBeProcessed(entryString);
         let fileTypeError = getFileType(entryString);
-        if(!canBeProcessed) {
-          makeError('le type '+ fileTypeError + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
+        if (!canBeProcessed) {
+          makeError('le type ' + fileTypeError + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
           process.exit();
         }
         this.eventManager.emit('packify:eachEntry', entryString);
-        
+
         this.eventManager.emit('packify:readContent', readFileSync(entryString));
 
       })
@@ -166,8 +164,8 @@ class Core {
 
         let canBeProcessed = this.canBeProcessed(entryPoint);
         let fileTypeError = getFileType(entryPoint);
-        if(!canBeProcessed) {
-          makeError('le type '+ fileTypeError + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
+        if (!canBeProcessed) {
+          makeError('le type ' + fileTypeError + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
           process.exit();
         }
 
