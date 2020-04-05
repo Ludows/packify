@@ -10,7 +10,7 @@
   "license": "UNLICENSED",
   "dependencies": {
     "@babel/core": "^7.9.0",
-    "@babel/parser": "^7.9.2",
+    "babylon": "^6.18.0",
     "@babel/traverse": "^7.9.0",
     "babel-preset-env": "^1.7.0",
     "deepmerge": "^4.2.2",
