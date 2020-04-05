@@ -9,7 +9,7 @@ const {
     getListingDir
 } = require('../libs/helpers')
 
-const parser = require("@babel/parser"); // parses and returns AST
+const parser = require("babylon"); // parses and returns AST
 const traverse = require("@babel/traverse").default; // walks through AST
 const babel = require("@babel/core"); // main babel functionality
 
