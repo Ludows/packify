@@ -3,6 +3,7 @@ const {
     getEventManager,
     formatPath,
     getBasePath,
+    readFileSync,
     getFileName,
     getFileType,
     getListingDir
@@ -47,7 +48,7 @@ class JsExtractorPlugin extends PluginBase {
         })
     }
     createAsset(filename) {
-        let content = fs.readFileSync(filename, 'utf-8');
+        let content = readFileSync(filename);
 
         const ast = parser.parse(content, {
             sourceType: "module"
@@ -74,7 +75,7 @@ class JsExtractorPlugin extends PluginBase {
         };
     }
     createGraph(entry) {
-        const mainAsset = createAsset(entry);
+        const mainAsset = this.createAsset(entry);
         const queue = [mainAsset];
 
         for (const asset of queue) {
@@ -84,7 +85,7 @@ class JsExtractorPlugin extends PluginBase {
 
                 const absolutePath = path.join(dirname, relativePath);
 
-                const child = createAsset(absolutePath);
+                const child = this.createAsset(absolutePath);
 
                 asset.mapping[relativePath] = child.id;
                 queue.push(child);

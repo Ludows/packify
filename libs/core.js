@@ -19,12 +19,6 @@ class Core {
     this.Queue = [];
     this.start();
   }
-  static entry(pathEntry) {
-    if (typeOf(pathEntry) === "object" || typeOf(pathEntry) === "undefined") {
-      makeError('Oops ! Il semblerait qu\' il y ait une erreur. Packify ne supporte actuellement que ces types pour ces entrées : <Array> or <String>');
-      process.exit();
-    }
-  }
   queue(file) {
 
     if (!file) {
@@ -53,8 +47,7 @@ class Core {
   canBeProcessed(extension) {
     let ret = false;
     let extensions = this.get('extensionsTriggered');
-
-    if (extensions.indexOf(extension) > -1) {
+    if (extensions.indexOf(getFileType(extension)) > -1) {
       ret = true;
     }
     return ret;
