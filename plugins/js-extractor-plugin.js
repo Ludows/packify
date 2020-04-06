@@ -5,6 +5,7 @@ const {
     getBasePath,
     readFileSync,
     getFileName,
+    getDirectory,
     getFileType,
     getListingDir
 } = require('../libs/helpers')
@@ -36,6 +37,8 @@ class JsExtractorPlugin extends PluginBase {
             let graph = this.createGraph(entry);
             let bundle = this.bundle(graph);
 
+            console.log('bundle', bundle)
+
             let file = {
                 src: entry,
                 destPath: this.formatDestPath(entry, compiler.options.output.path),
@@ -49,6 +52,8 @@ class JsExtractorPlugin extends PluginBase {
     }
     createAsset(filename) {
         let content = readFileSync(filename);
+
+        // console.log('content', content);
 
         const ast = parser.parse(content, {
             sourceType: "module"
@@ -69,7 +74,7 @@ class JsExtractorPlugin extends PluginBase {
 
         return {
             id,
-            filePath,
+            filename,
             dependencies,
             code
         };
@@ -80,10 +85,10 @@ class JsExtractorPlugin extends PluginBase {
 
         for (const asset of queue) {
             asset.mapping = {};
-            const dirname = path.dirname(asset.filename);
+            const dirname = getDirectory(asset.filename);
             asset.dependencies.forEach(relativePath => {
 
-                const absolutePath = path.join(dirname, relativePath);
+                const absolutePath = formatPath(dirname, relativePath);
 
                 const child = this.createAsset(absolutePath);
 
@@ -93,7 +98,7 @@ class JsExtractorPlugin extends PluginBase {
         }
         return queue;
     }
-    bundle() {
+    bundle(graph) {
         let modules = '';
         graph.forEach(mod => {
             modules += `${mod.id}: [
@@ -102,8 +107,9 @@ class JsExtractorPlugin extends PluginBase {
                 },
                 ${JSON.stringify(mod.mapping)},
             ],`;
+        })
 
-            const result = `
+        const result = `
                 (function(modules) {
                 function require(id) {
                     const [fn, mapping] = modules[id];
@@ -120,7 +126,6 @@ class JsExtractorPlugin extends PluginBase {
 
             // We simply return the result, hurray! :)
             return result;
-        })
     }
 }
 

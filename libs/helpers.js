@@ -6,6 +6,8 @@ const eventEmitter = new events.EventEmitter();
 const PrettyError = require('pretty-error');
 const pe = new PrettyError();
 
+const { execSync } = require('child_process');
+
 const basePackifyConfig = require('../configs/packify');
 
 function mergeConfig(opts) {
@@ -49,6 +51,17 @@ function makeError(...args) {
     // console.log(renderedError);
 }
 
+function isDependency(...args) {
+    let jsonDeps = JSON.parse(execSync('npm ls --json=true --parseable=true').toString());
+}
+
+function resolve(string) {
+    // checker si on a un alias de caché dans la chaine de caractère
+    // on checke d'abord si c'est une dependency
+    // on checke si on a un lien relatif ou pas
+
+}
+
 function walker(dir, filelist, recursive, extensions = []) {
     var fs = fs || require('fs'),
         files = fs.existsSync(dir) ? fs.readdirSync(dir) : [],
@@ -80,7 +93,7 @@ function unique(array) {
 }
 
 function readFileSync(url) {
-    return fs.readFileSync(url);
+    return fs.readFileSync(url, 'utf-8');
 }
 
 function getFileType(...args) {
@@ -97,6 +110,10 @@ function getDirectory(...args) {
 
 function getListingDir(pathFile, FileTypesOpt = false) {
     return fs.readdirSync(pathFile, {withFileTypes: FileTypesOpt});
+}
+
+function isRelativePath(...args) {
+    return path.isAbsolute(...args);
 }
 
 function getExtendOption() {
@@ -121,6 +138,7 @@ function getExtendOption() {
 }
 
 module.exports = {
+    isDependency,
     mergeConfig,
     mergeObjects,
     getPath,
@@ -138,5 +156,7 @@ module.exports = {
     unique,
     getListingDir,
     readFileSync,
-    getExtendOption
+    getExtendOption,
+    isRelativePath,
+    resolve
 }
