@@ -6,7 +6,7 @@ const eventEmitter = new events.EventEmitter();
 const PrettyError = require('pretty-error');
 const pe = new PrettyError();
 
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 
 const basePackifyConfig = require('../configs/packify');
 
@@ -67,7 +67,7 @@ function isNameDependency(string) {
 }
 
 function getListingDependenciesProject() {
-    return execSync('npm ls --json=true');
+    return spawnSync('npm ls --json=true');
 }
 
 function walker(dir, filelist, recursive, extensions = []) {
