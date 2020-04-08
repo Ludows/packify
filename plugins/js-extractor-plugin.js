@@ -19,6 +19,7 @@ class JsExtractorPlugin extends PluginBase {
     constructor(name, opts) {
         super(name, opts)
         this.ID = 0;
+        this.deps = getListingDependenciesProject()
     }
     extensions() {
         return ['js']
@@ -84,8 +85,8 @@ class JsExtractorPlugin extends PluginBase {
         const mainAsset = this.createAsset(entry);
         const queue = [mainAsset];
         
-        let depJson = getListingDependenciesProject();
-        console.log('depJson', depJson)
+        
+        console.log('depJson', this.deps)
 
         for (const asset of queue) {
             asset.mapping = {};
