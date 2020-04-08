@@ -7,7 +7,8 @@ const {
     getFileName,
     getDirectory,
     getFileType,
-    getListingDir
+    getListingDir,
+    getListingDependenciesProject
 } = require('../libs/helpers')
 
 const parser = require("babylon"); // parses and returns AST
@@ -82,6 +83,9 @@ class JsExtractorPlugin extends PluginBase {
     createGraph(entry) {
         const mainAsset = this.createAsset(entry);
         const queue = [mainAsset];
+        
+        let depJson = getListingDependenciesProject();
+        console.log('depJson', depJson)
 
         for (const asset of queue) {
             asset.mapping = {};

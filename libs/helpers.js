@@ -62,6 +62,14 @@ function resolve(string) {
 
 }
 
+function isNameDependency(string) {
+
+}
+
+function getListingDependenciesProject() {
+    return execSync('npm ls --json=true');
+}
+
 function walker(dir, filelist, recursive, extensions = []) {
     var fs = fs || require('fs'),
         files = fs.existsSync(dir) ? fs.readdirSync(dir) : [],
@@ -139,6 +147,8 @@ function getExtendOption() {
 
 module.exports = {
     isDependency,
+    getListingDependenciesProject,
+    isNameDependency,
     mergeConfig,
     mergeObjects,
     getPath,
