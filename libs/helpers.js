@@ -5,6 +5,8 @@ const events = require('events');
 const eventEmitter = new events.EventEmitter();
 const PrettyError = require('pretty-error');
 const pe = new PrettyError();
+const Readable = require('stream').Readable;
+
 
 const { execSync, spawnSync } = require('child_process');
 
@@ -140,6 +142,12 @@ function createWriteStream(...args) {
     return fs.createWriteStream(...args);
 }
 
+function createReadStreamFromString(...args) {
+    let s = new Readable();
+    s.push(...args);
+    return s;
+}
+
 function getExtendOption() {
     let filePackifyExist = fs.existsSync(getPath('packify.config.js'))
     // console.log('getPath', getPath('packify.config.js'))
@@ -164,6 +172,7 @@ function getExtendOption() {
 module.exports = {
     createReadStream,
     createWriteStream,
+    createReadStreamFromString,
     writeFileSync,
     existFileSync,
     isDependency,
