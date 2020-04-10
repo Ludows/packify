@@ -14,6 +14,7 @@ let thePathPackageJson = path.join(process.env.INIT_CWD, 'package.json');
 
 
 let scriptsCommands = {
+    'postinstall': 'node_modules/@ludoows/packify/cli/generateDeps.js',
     'packify:dev': 'cross-env NODE_ENV=development node_modules/@ludoows/packify/cli/init.js --config=node_modules/@ludoows/packify/configs/packify.js',
     'packify:prod': 'cross-env NODE_ENV=production node_modules/@ludoows/packify/cli/init.js --config=node_modules/@ludoows/packify/configs/packify.js',
     'packify:watch': 'cross-env NODE_ENV=development node_modules/@ludoows/packify/cli/init.js --config=node_modules/@ludoows/packify/configs/packify.js --watch'
