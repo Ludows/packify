@@ -108,6 +108,14 @@ function getFileType(...args) {
     return path.extname(...args).substr(1);
 }
 
+function existFileSync(...args) {
+    return fs.existsSync(...args);
+}
+
+function writeFileSync(...args) {
+    return fs.writeFileSync(...args)
+}
+
 function getFileName(...args) {
     return path.basename(...args)
 }
@@ -146,6 +154,8 @@ function getExtendOption() {
 }
 
 module.exports = {
+    writeFileSync,
+    existFileSync,
     isDependency,
     getListingDependenciesProject,
     isNameDependency,

@@ -9,7 +9,10 @@ const {
   formatPath,
   unique,
   readFileSync,
-  getFileType
+  getFileType, 
+  existFileSync,
+  writeFileSync,
+  getListingDependenciesProject
 } = require('./helpers');
 
 class Core {
@@ -178,11 +181,11 @@ class Core {
 
     console.log('depsPath', depsPath)
 
-    if(!fs.existsSync(depsPath)) {
+    if(!existFileSync(depsPath)) {
         console.log('check deps.json is not existing... we build this.');
         let listing = getListingDependenciesProject();
         // console.log('listing', listing)
-        fs.writeFileSync(listing);
+        writeFileSync(listing);
     }
   }
   start() {
