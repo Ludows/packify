@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { getPath } = require('../libs/helpers');
+const { getPath, getListingDependenciesProject } = require('../libs/helpers');
 const fs = require('fs');
 const path = require('path');
 
@@ -35,9 +35,22 @@ keysScript.forEach((key) => {
 let cliPath = getPath('cli', 'init.js');
 let baseOptionsExtendPath = getPath('configs', 'packify.config.js');
 
+let depsPath = getPath('deps.json');
+let depsCliPath = getPath('cli', 'deps.json');
+
 
 fs.chmodSync(cliPath, '755');
 fs.chmodSync(baseOptionsExtendPath, '755');
+
+if(!fs.existsSync(depsPath)) {
+    let listing = getListingDependenciesProject();
+    fs.writeFileSync(listing);
+}
+
+if(fs.existsSync(depsPath)) {
+    fs.chmodSync(depsPath, '755');
+    fs.chmodSync(depsCliPath, '755');
+}
 
 
 fs.writeFileSync(thePathPackageJson, '');
