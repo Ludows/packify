@@ -132,6 +132,14 @@ function isRelativePath(...args) {
     return path.isAbsolute(...args);
 }
 
+function createReadStream(...args) {
+    return fs.createReadStream(...args);
+}
+
+function createWriteStream(...args) {
+    return fs.createWriteStream(...args);
+}
+
 function getExtendOption() {
     let filePackifyExist = fs.existsSync(getPath('packify.config.js'))
     // console.log('getPath', getPath('packify.config.js'))
@@ -154,6 +162,8 @@ function getExtendOption() {
 }
 
 module.exports = {
+    createReadStream,
+    createWriteStream,
     writeFileSync,
     existFileSync,
     isDependency,

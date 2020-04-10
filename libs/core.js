@@ -12,7 +12,9 @@ const {
   getFileType, 
   existFileSync,
   writeFileSync,
-  getListingDependenciesProject
+  getListingDependenciesProject,
+  createReadStream, 
+  createWriteStream
 } = require('./helpers');
 
 class Core {
@@ -183,9 +185,13 @@ class Core {
 
     if(!existFileSync(depsPath)) {
         console.log('check deps.json is not existing... we build this.');
-        let listing = getListingDependenciesProject();
+        let listing = createReadStream(getListingDependenciesProject());
         // console.log('listing', listing)
-        writeFileSync(listing);
+        listing.pipe(createWriteStream(depsPath))
+        listing.on('finish', () => {
+          console.log('deps.json created')
+        })
+        
     }
   }
   start() {
