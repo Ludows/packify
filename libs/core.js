@@ -171,7 +171,23 @@ class Core {
     }
 
   }
+  checkDeps() {
+    console.log('check deps.json is existing... ');
+    console.log('depsPath', depsPath)
+
+    let depsPath = getPath('node_modules', '@ludoows', 'packify', 'deps.json');
+
+    console.log('depsPath', depsPath)
+
+    if(!fs.existsSync(depsPath)) {
+        console.log('check deps.json is not existing... we build this.');
+        let listing = getListingDependenciesProject();
+        // console.log('listing', listing)
+        fs.writeFileSync(listing);
+    }  
+  }
   start() {
+    this.checkDeps();
     this.set('extensionsTriggered', []);
     this.managePlugins();
     this.$init();

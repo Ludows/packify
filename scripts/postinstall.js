@@ -35,10 +35,6 @@ keysScript.forEach((key) => {
 let cliPath = getPath('cli', 'init.js');
 let baseOptionsExtendPath = getPath('configs', 'packify.config.js');
 
-let depsPath = getPath('deps.json');
-let depsCliPath = getPath('cli', 'deps.json');
-
-
 
 process.on('exit', function(code) {
     
