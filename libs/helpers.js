@@ -67,7 +67,7 @@ function isNameDependency(string) {
 }
 
 function getListingDependenciesProject() {
-    return spawnSync('npm ls --json=true');
+    return execSync('npm ls --json=true');
 }
 
 function walker(dir, filelist, recursive, extensions = []) {
