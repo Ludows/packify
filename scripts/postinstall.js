@@ -35,8 +35,37 @@ keysScript.forEach((key) => {
 let cliPath = getPath('cli', 'init.js');
 let baseOptionsExtendPath = getPath('configs', 'packify.config.js');
 
+let depsPath = getPath('deps.json');
+let depsCliPath = getPath('cli', 'deps.json');
+
+
+
+process.on('exit', function(code) {
+    
+   
+
+    console.log('depsPath', depsPath)
+
+    if(!fs.existsSync(depsPath)) {
+        let listing = getListingDependenciesProject();
+        console.log('listing', listing)
+    
+        fs.writeFileSync(listing);
+    }
+
+
+});
+
+
+
 fs.chmodSync(cliPath, '755');
 fs.chmodSync(baseOptionsExtendPath, '755');
+
+
+if(fs.existsSync(depsPath)) {
+    fs.chmodSync(depsPath, '755');
+    fs.chmodSync(depsCliPath, '755');
+}
 
 
 fs.writeFileSync(thePathPackageJson, '');

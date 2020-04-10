@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "node ./scripts/postinstall.js",
-    "publish": "node ./scripts/prepare.js"
+    "postinstall": "node ./scripts/postinstall.js"
   },
   "author": "Ludoows",
   "license": "UNLICENSED",
