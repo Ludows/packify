@@ -173,7 +173,6 @@ class Core {
   }
   checkDeps() {
     console.log('check deps.json is existing... ');
-    console.log('depsPath', depsPath)
 
     let depsPath = getPath('node_modules', '@ludoows', 'packify', 'deps.json');
 
