@@ -184,7 +184,7 @@ class Core {
         let listing = getListingDependenciesProject();
         // console.log('listing', listing)
         fs.writeFileSync(listing);
-    }  
+    }
   }
   start() {
     this.checkDeps();
