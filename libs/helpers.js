@@ -53,23 +53,23 @@ function makeError(...args) {
     // console.log(renderedError);
 }
 
-function isDependency(...args) {
-    let jsonDeps = JSON.parse(execSync('npm ls --json=true --parseable=true').toString());
-}
-
-function resolve(string) {
+function typeOfModule(string) {
     // checker si on a un alias de caché dans la chaine de caractère
     // on checke d'abord si c'est une dependency
     // on checke si on a un lien relatif ou pas
+    let typedModule = null;
 
-}
+    if(string.indexOf(path.sep) === -1) {
+        typedModule = "dependencyName";
+    }
 
-function isNameDependency(string) {
+    // if() {
 
-}
+    // }
 
-function getListingDependenciesProject() {
-    return execSync('npm ls --json=true');
+    return typedModule;
+    
+
 }
 
 function walker(dir, filelist, recursive, extensions = []) {
@@ -130,6 +130,10 @@ function getListingDir(pathFile, FileTypesOpt = false) {
     return fs.readdirSync(pathFile, {withFileTypes: FileTypesOpt});
 }
 
+function haveSeparator(...args) {
+    return args.indexOf(path.sep);
+}
+
 function isRelativePath(...args) {
     return path.isAbsolute(...args);
 }
@@ -140,12 +144,6 @@ function createReadStream(...args) {
 
 function createWriteStream(...args) {
     return fs.createWriteStream(...args);
-}
-
-function createReadStreamFromString(...args) {
-    let s = new Readable();
-    s.push(...args);
-    return s;
 }
 
 function getExtendOption() {
@@ -164,20 +162,17 @@ function getExtendOption() {
     }
 
     let result = require(file)
-    console.log('result', result);
+    // console.log('result', result);
 
     return result;
 }
 
 module.exports = {
+    haveSeparator,
     createReadStream,
     createWriteStream,
-    createReadStreamFromString,
     writeFileSync,
     existFileSync,
-    isDependency,
-    getListingDependenciesProject,
-    isNameDependency,
     mergeConfig,
     mergeObjects,
     getPath,
@@ -197,5 +192,5 @@ module.exports = {
     readFileSync,
     getExtendOption,
     isRelativePath,
-    resolve
+    typeOfModule
 }

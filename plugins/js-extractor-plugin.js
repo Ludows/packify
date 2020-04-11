@@ -8,6 +8,7 @@ const {
     getDirectory,
     getFileType,
     getListingDir,
+    typeOfModule
 } = require('../libs/helpers')
 
 const parser = require("babylon"); // parses and returns AST
@@ -90,7 +91,10 @@ class JsExtractorPlugin extends PluginBase {
         for (const asset of queue) {
             asset.mapping = {};
             const dirname = getDirectory(asset.filename);
+            console.log('have dependencies ?', asset.dependencies);
             asset.dependencies.forEach(relativePath => {
+
+                let typedModule = typeOfModule(relativePath)
 
                 const absolutePath = formatPath(dirname, relativePath);
 

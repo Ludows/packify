@@ -176,26 +176,7 @@ class Core {
     }
 
   }
-  checkDeps() {
-    console.log('check deps.json is existing... ');
-
-    let depsPath = getPath('node_modules', '@ludoows', 'packify', 'deps.json');
-
-    console.log('depsPath', depsPath)
-
-    if(!existFileSync(depsPath)) {
-        console.log('check deps.json is not existing... we build this.');
-        let listing = createReadStreamFromString(getListingDependenciesProject());
-        // console.log('listing', listing)
-        listing.pipe(createWriteStream(depsPath))
-        listing.on('finish', () => {
-          console.log('deps.json created')
-        })
-        
-    }
-  }
   start() {
-    this.checkDeps();
     this.set('extensionsTriggered', []);
     this.managePlugins();
     this.$init();
