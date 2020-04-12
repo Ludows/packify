@@ -185,7 +185,7 @@ class Core {
 
         this.eventManager.emit('packify:readContent', readFileSync(entryPoint));
         
-        if(formaterCounter === formater.length) {
+        if(formaterCounter === entry.length) {
           this.eventManager.emit('packify:processEnded', this.Queue);
         }
         
