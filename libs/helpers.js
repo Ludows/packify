@@ -53,19 +53,86 @@ function makeError(...args) {
     // console.log(renderedError);
 }
 
+function moduleResolver(...args) {
+    console.log('...args name', args[0])
+    console.log('...args obj', args[1])
+    let res;
+    switch (args[0]) {
+        case 'moduleName':
+        case 'moduleAbsoluteResolution':
+            res = resolve.sync(args[1].relativePath, { basedir: getPath('node_modules') })
+            console.log('res', res)
+            break;
+        case 'dependencyAbsoluteResolution':
+        case 'dependencyRelativeResolution':
+            res = resolve.sync(args[1].relativePath, { basedir: args[1].dirname })
+            console.log('res', res)
+            break;
+    
+        default:
+            break;
+    }
+    return res;
+}
+
 function typeOfModule(string) {
     // checker si on a un alias de caché dans la chaine de caractère
     // on checke d'abord si c'est une dependency
     // on checke si on a un lien relatif ou pas
     let typedModule = null;
+    let wasDeterminated = false;
 
-    if(string.indexOf(path.sep) === -1) {
-        typedModule = "dependencyName";
+    if(string.indexOf(path.sep) === -1 && !wasDeterminated) {
+        typedModule = "moduleName";
+        wasDeterminated = true;
     }
+
+    let pathCheck = path.isAbsolute(string);
+
+    console.log('pathCheck', pathCheck)
+
+    if(pathCheck == true && !wasDeterminated) {
+        // console.log('pathCheck', pathCheck)
+
+        let checkingPresenceOfPackagename = string.split(path.sep);
+
+        console.log('checkingPresenceOfPackagename', checkingPresenceOfPackagename)
+
+        let canBePathModule = getPath('node_modules', checkingPresenceOfPackagename[0]);
+        console.log('canBePathModule', canBePathModule)
+
+        let thePathCheck = existFileSync(canBePathModule);
+
+        // console.log('thePathCheck', thePathCheck)
+
+        // si ca existe c'est une resolution a un module a faire..
+        if(thePathCheck && !wasDeterminated) {
+            typedModule = "moduleAbsoluteResolution";
+            wasDeterminated = true;
+        }
+        else {
+            if(!wasDeterminated) {
+                typedModule = "dependencyAbsoluteResolution";
+                wasDeterminated = true;
+            }
+        }
+
+    }
+    else {
+        if(!wasDeterminated) {
+            typedModule = "dependencyRelativeResolution";
+            wasDeterminated = true;
+        }
+    }
+
+    
+    
 
     // if() {
 
     // }
+
+    console.log('typedModule', typedModule)
 
     return typedModule;
     
@@ -168,6 +235,7 @@ function getExtendOption() {
 }
 
 module.exports = {
+    moduleResolver,
     haveSeparator,
     createReadStream,
     createWriteStream,

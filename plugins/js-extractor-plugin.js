@@ -39,7 +39,7 @@ class JsExtractorPlugin extends PluginBase {
             let graph = this.createGraph(entry);
             let bundle = this.bundle(graph);
 
-            console.log('bundle', bundle)
+            // console.log('bundle', bundle)
 
             let file = {
                 src: entry,
