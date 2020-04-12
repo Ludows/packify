@@ -49,6 +49,7 @@ function requireFile(...args) {
 
 function makeError(...args) {
     var renderedError = pe.render(new Error(...args));
+    pe.start();
     // console.log(renderedError);
 }
 
