@@ -21,7 +21,7 @@ class Core {
   constructor(opts) {
     this.options = mergeConfig(opts);
     this.eventManager = getEventManager();
-    this.Queue = [];
+    this.Queue = {};
     this.start();
   }
   queue(file) {
@@ -31,22 +31,27 @@ class Core {
       process.exit();
     }
 
-    if (this.isInQueue(file)) {
-
+    if (this.isInQueue(file) === false) {
+      this.Queue[file.src] = file
     } else {
       // Todo cas de l'update
+      this.Queue[file.src].content = file.content;
     }
 
   }
   isInQueue(fileObject) {
     let ret = false;
-    for (let index = 0; index < this.Queue.length; index++) {
-      const file = this.Queue[index];
-      if (file.src === fileObject.src) {
-        ret = true
-        break;
+    let QueueKeys = Object.keys(this.Queue)
+    if(QueueKeys.length > 0) {
+      for (let index = 0; index < QueueKeys.length; index++) {
+        const file = this.Queue[QueueKeys[index]];
+        if (file.src === fileObject.src) {
+          ret = true
+          break;
+        }
       }
     }
+    
     return ret;
   }
   canBeProcessed(extension) {
@@ -147,6 +152,7 @@ class Core {
         let canBeProcessed = this.canBeProcessed(entryString);
         let fileTypeError = getFileType(entryString);
         if (!canBeProcessed) {
+          console.log('entryString can not be processed', entryString)
           makeError('le type ' + fileTypeError + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
           process.exit();
         }

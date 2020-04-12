@@ -25,17 +25,11 @@ class JsExtractorPlugin extends PluginBase {
     extensions() {
         return ['js']
     }
-    formatDestPath(srcUrl, destUrl) {
-
-        let dirs = getListingDir(process.cwd());
-
-        console.log('dirs');
-    }
     run(compiler) {
         let eventManager = getEventManager();
 
         eventManager.on('packify:eachEntry', (entry) => {
-            console.log('entry', entry)
+            // console.log('entry', entry)
             // this.createModuleInfo(content);
             let graph = this.createGraph(entry);
             let bundle = this.bundle(graph);
@@ -44,14 +38,14 @@ class JsExtractorPlugin extends PluginBase {
 
             let file = {
                 src: entry,
-                destPath: this.formatDestPath(entry, compiler.options.output.path),
+                destPath: '',
                 name: getFileName(entry),
                 extension: getFileType(entry),
-                content: bundle
+                content: bundle,
+                graph: graph
             }
-            
-            // On va ensuite pour le système de queue..
-            // compiler.queue(file);
+
+            compiler.queue(file);
         })
     }
     createAsset(filename) {
@@ -62,6 +56,10 @@ class JsExtractorPlugin extends PluginBase {
         const ast = parser.parse(content, {
             sourceType: "module"
         });
+
+        
+
+        
 
         const dependencies = [];
         traverse(ast, {
@@ -75,6 +73,11 @@ class JsExtractorPlugin extends PluginBase {
         const {
             code
         } = babel.transformFromAstSync(ast, null, this.options);
+
+        // if(filename.includes('default')) {
+        //     console.log('code gen', code)
+        //     // return;
+        // }
 
         return {
             id,
@@ -93,7 +96,7 @@ class JsExtractorPlugin extends PluginBase {
         for (const asset of queue) {
             asset.mapping = {};
             const dirname = getDirectory(asset.filename);
-            console.log('have dependencies ?', asset.dependencies);
+            // console.log('have dependencies ?', asset.dependencies);
             asset.dependencies.forEach(relativePath => {
 
                 let typedModule = typeOfModule(relativePath)

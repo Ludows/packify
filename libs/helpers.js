@@ -5,8 +5,7 @@ const events = require('events');
 const eventEmitter = new events.EventEmitter();
 const PrettyError = require('pretty-error');
 const pe = new PrettyError();
-const Readable = require('stream').Readable;
-
+const resolve = require('resolve');
 
 const { execSync, spawnSync } = require('child_process');
 
@@ -54,19 +53,19 @@ function makeError(...args) {
 }
 
 function moduleResolver(...args) {
-    console.log('...args name', args[0])
-    console.log('...args obj', args[1])
+    // console.log('...args name', args[0])
+    // console.log('...args obj', args[1])
     let res;
     switch (args[0]) {
         case 'moduleName':
         case 'moduleAbsoluteResolution':
             res = resolve.sync(args[1].relativePath, { basedir: getPath('node_modules') })
-            console.log('res', res)
+            // console.log('res', res)
             break;
         case 'dependencyAbsoluteResolution':
         case 'dependencyRelativeResolution':
             res = resolve.sync(args[1].relativePath, { basedir: args[1].dirname })
-            console.log('res', res)
+            // console.log('res', res)
             break;
     
         default:
@@ -89,17 +88,17 @@ function typeOfModule(string) {
 
     let pathCheck = path.isAbsolute(string);
 
-    console.log('pathCheck', pathCheck)
+    // console.log('pathCheck', pathCheck)
 
     if(pathCheck == true && !wasDeterminated) {
         // console.log('pathCheck', pathCheck)
 
         let checkingPresenceOfPackagename = string.split(path.sep);
 
-        console.log('checkingPresenceOfPackagename', checkingPresenceOfPackagename)
+        // console.log('checkingPresenceOfPackagename', checkingPresenceOfPackagename)
 
         let canBePathModule = getPath('node_modules', checkingPresenceOfPackagename[0]);
-        console.log('canBePathModule', canBePathModule)
+        // console.log('canBePathModule', canBePathModule)
 
         let thePathCheck = existFileSync(canBePathModule);
 
@@ -125,14 +124,7 @@ function typeOfModule(string) {
         }
     }
 
-    
-    
-
-    // if() {
-
-    // }
-
-    console.log('typedModule', typedModule)
+    // console.log('typedModule', typedModule)
 
     return typedModule;
     
@@ -149,8 +141,8 @@ function walker(dir, filelist, recursive = true, extensions = [], excludePattern
                 filelist = walker(path.join(dir, file), filelist, recursive, extensions, excludePattern);
             } else {
                 let extname = path.extname(file).substr(1);
-                console.log('file ?', file)
-                console.log('file.charAt(0)', file.charAt(0))
+                // console.log('file ?', file)
+                // console.log('file.charAt(0)', file.charAt(0))
                 if (extensions.indexOf(extname) > -1 && extensions.length > 0) {
                     if(excludePattern.length > 0 && file.charAt(0) != excludePattern) {
                         filelist.push(path.join(dir, file));
