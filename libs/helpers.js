@@ -139,25 +139,37 @@ function typeOfModule(string) {
 
 }
 
-function walker(dir, filelist, recursive, extensions = []) {
+function walker(dir, filelist, recursive = true, extensions = [], excludePattern = '') {
     var fs = fs || require('fs'),
         files = fs.existsSync(dir) ? fs.readdirSync(dir) : [],
         filelist = filelist || [];
     files.forEach(function (file) {
         if (recursive != undefined && recursive) {
             if (fs.statSync(path.join(dir, file)).isDirectory()) {
-                filelist = walker(path.join(dir, file), filelist, recursive, extensions);
+                filelist = walker(path.join(dir, file), filelist, recursive, extensions, excludePattern);
             } else {
                 let extname = path.extname(file).substr(1);
+                console.log('file ?', file)
+                console.log('file.charAt(0)', file.charAt(0))
                 if (extensions.indexOf(extname) > -1 && extensions.length > 0) {
-                    filelist.push(path.join(dir, file));
+                    if(excludePattern.length > 0 && file.charAt(0) != excludePattern) {
+                        filelist.push(path.join(dir, file));
+                    }
+                    else if(excludePattern.length === 0) {
+                        filelist.push(path.join(dir, file));
+                    }
                 }
             }
         } else {
             var full_path = path.join(dir, file);
             let extname = path.extname(file).substr(1);
             if (extensions.indexOf(extname) > -1 && extensions.length > 0) {
-                filelist.push(path.join(dir, file));
+                if(excludePattern.length > 0 && file.charAt(0) != excludePattern) {
+                    filelist.push(path.join(dir, file));
+                }
+                else if(excludePattern.length === 0) {
+                    filelist.push(path.join(dir, file));
+                }
             }
         }
 
