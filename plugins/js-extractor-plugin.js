@@ -8,7 +8,8 @@ const {
     getDirectory,
     getFileType,
     getListingDir,
-    typeOfModule
+    typeOfModule,
+    moduleResolver
 } = require('../libs/helpers')
 
 const parser = require("babylon"); // parses and returns AST
@@ -48,8 +49,9 @@ class JsExtractorPlugin extends PluginBase {
                 extension: getFileType(entry),
                 content: bundle
             }
-
-            compiler.queue(file);
+            
+            // On va ensuite pour le système de queue..
+            // compiler.queue(file);
         })
     }
     createAsset(filename) {
@@ -96,7 +98,12 @@ class JsExtractorPlugin extends PluginBase {
 
                 let typedModule = typeOfModule(relativePath)
 
-                const absolutePath = formatPath(dirname, relativePath);
+                let pathResolver = moduleResolver(typedModule, {
+                    dirname: dirname,
+                    relativePath: relativePath
+                })
+
+                const absolutePath = pathResolver;
 
                 const child = this.createAsset(absolutePath);
 
