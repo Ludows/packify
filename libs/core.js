@@ -142,6 +142,8 @@ class Core {
 
     let entry = this.get('entry');
     let entryType = typeOf(entry);
+
+    let formaterCounter = 0;
     // console.log('entryType', entryType)
 
     if (entryType === 'string') {
@@ -160,6 +162,11 @@ class Core {
 
         this.eventManager.emit('packify:readContent', readFileSync(entryString));
 
+        if(formaterCounter === formater.length) {
+          this.eventManager.emit('packify:processEnded', this.Queue);
+        }
+        
+        formaterCounter++;
       })
 
     } else {
@@ -169,6 +176,7 @@ class Core {
         let canBeProcessed = this.canBeProcessed(entryPoint);
         let fileTypeError = getFileType(entryPoint);
         if (!canBeProcessed) {
+          console.log('entryString can not be processed', entryString)
           makeError('le type ' + fileTypeError + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
           process.exit();
         }
@@ -176,7 +184,12 @@ class Core {
         this.eventManager.emit('packify:eachEntry', entryPoint);
 
         this.eventManager.emit('packify:readContent', readFileSync(entryPoint));
-
+        
+        if(formaterCounter === formater.length) {
+          this.eventManager.emit('packify:processEnded', this.Queue);
+        }
+        
+        formaterCounter++;
       })
 
     }
