@@ -162,7 +162,7 @@ class Core {
 
         this.eventManager.emit('packify:readContent', readFileSync(entryString));
 
-        if(formaterCounter === formater.length) {
+        if(formaterCounter === entry.length - 1) {
           this.eventManager.emit('packify:processEnded', this.Queue);
         }
         
@@ -186,7 +186,7 @@ class Core {
 
         this.eventManager.emit('packify:readContent', readFileSync(entryPoint));
         
-        if(formaterCounter === entry.length) {
+        if(formaterCounter === entry.length - 1) {
           this.eventManager.emit('packify:processEnded', this.Queue);
         }
         

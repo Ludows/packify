@@ -3,13 +3,7 @@ const {
     getEventManager,
     formatPath,
     getBasePath,
-    readFileSync,
     getFileName,
-    getDirectory,
-    getFileType,
-    getListingDir,
-    typeOfModule,
-    moduleResolver
 } = require('../libs/helpers')
 
 const crypto = require('crypto');
@@ -27,11 +21,19 @@ class ExporterPlugin extends PluginBase {
 
         eventManager.on('packify:processEnded', (Queue) => {
             console.log('Queue packify:processEnded', Queue)  
+
+            Queue.forEach((file) => {
+                console.log('file', file)
+            })
+
         })
     }
     createHash(name) {
         var hash = crypto.createHash('md5').update(name).digest('hex');
         return hash;
+    }
+    createStreamableProcess() {
+
     }
 }
 
