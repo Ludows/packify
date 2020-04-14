@@ -7,8 +7,8 @@ const {
 } = require('../libs/helpers');
 
 const folders = [
-    getPath('resources'),
-    getPath('public', 'images')
+    getPath('resources', 'assets'),
+    // getPath('public', 'images')
 ]
 
 let assets = [];
