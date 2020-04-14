@@ -17,6 +17,9 @@ const {
   createWriteStream
 } = require('./helpers');
 
+const ProgressUi = require('./progress');
+const colors = require('colors/safe');
+
 class Core {
   constructor(opts) {
     this.options = mergeConfig(opts);
@@ -136,8 +139,30 @@ class Core {
     return ret;
 
   }
+  $startProgress(maxInt) {
+    this.Progress.start(maxInt, 0, {
+      speed: "N/A"
+    });
+    return this;
+  }
+  $updateProgress(integer) {
+    this.Progress.update(integer);
+    return this;
+  }
+  $stopProgress() {
+    this.Progress.stop();
+    return this;
+  }
   $init() {
     this.eventManager.emit('packify:init');
+
+    let progressPck = new ProgressUi({
+      format: 'CLI Progress |' + colors.green('{bar}') + '| {percentage}%'
+    })
+
+    let progress = progressPck.make();
+
+    this.set('Progress', progress);
 
 
     let entry = this.get('entry');
@@ -146,21 +171,27 @@ class Core {
     let formaterCounter = 0;
     // console.log('entryType', entryType)
 
+    
+
     if (entryType === 'string') {
 
       let formater = [];
       formater.push(entry);
+
+      this.$startProgress(formater.length);
+
       formater.forEach((entryString) => {
         let canBeProcessed = this.canBeProcessed(entryString);
         let fileTypeError = getFileType(entryString);
         if (!canBeProcessed) {
           console.log('entryString can not be processed', entryString)
           makeError('le type ' + fileTypeError + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
+          this.$stopProgress();
           process.exit();
         }
         this.eventManager.emit('packify:eachEntry', entryString);
 
-        this.eventManager.emit('packify:readContent', readFileSync(entryString));
+        this.$updateProgress(formaterCounter);
 
         if(formaterCounter === entry.length - 1) {
           this.eventManager.emit('packify:processEnded', this.Queue);
@@ -170,7 +201,8 @@ class Core {
       })
 
     } else {
-
+      
+      this.$startProgress(entry.length);
       entry.forEach((entryPoint) => {
 
         let canBeProcessed = this.canBeProcessed(entryPoint);
@@ -179,15 +211,17 @@ class Core {
         if (!canBeProcessed) {
           console.log('entryString can not be processed', entryPoint)
           makeError('le type ' + fileTypeError + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
+          this.$stopProgress();
           process.exit();
         }
 
         this.eventManager.emit('packify:eachEntry', entryPoint);
 
-        this.eventManager.emit('packify:readContent', readFileSync(entryPoint));
+        this.$updateProgress(formaterCounter);
         
         if(formaterCounter === entry.length - 1) {
           this.eventManager.emit('packify:processEnded', this.Queue);
+          this.$stopProgress();
         }
         
         formaterCounter++;
