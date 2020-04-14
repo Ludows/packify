@@ -7,7 +7,8 @@ const BasePackifyConfig = {
     plugins: [
         ['js-extractor-plugin', {
             presets: ['env']
-        }]
+        }],
+        ['exporter-plugin', {}]
     ],
     alias: {
         '~': 'node_modules'

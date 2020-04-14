@@ -23,5 +23,5 @@ let options = requireFile(getPath(argv.config));
 
 let packify = new Core(mergeObjects(options, entries));
 
-console.log('packify instance', packify)
+// console.log('packify instance', packify)
 

@@ -175,6 +175,7 @@ class Core {
 
         let canBeProcessed = this.canBeProcessed(entryPoint);
         let fileTypeError = getFileType(entryPoint);
+        
         if (!canBeProcessed) {
           console.log('entryString can not be processed', entryPoint)
           makeError('le type ' + fileTypeError + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
