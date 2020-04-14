@@ -20,11 +20,10 @@ class ExporterPlugin extends PluginBase {
         let eventManager = getEventManager();
 
         eventManager.on('packify:processEnded', (Queue) => {
-            console.log('Queue packify:processEnded', Queue)  
-
-            Queue.forEach((file) => {
+            // console.log('Queue packify:processEnded', Queue)  
+            for (const file of Queue) {
                 console.log('file', file)
-            })
+            }
 
         })
     }
