@@ -50,6 +50,7 @@ class JsExtractorPlugin extends PluginBase {
             }
 
             compiler.queue(file);
+            compiler.$updateProgress(entryCounter);
         })
     }
     createAsset(filename) {

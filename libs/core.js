@@ -193,7 +193,10 @@ class Core {
         }
         this.eventManager.emit('packify:eachEntry', entryString, formaterCounter);
 
-        this.$updateProgress(formaterCounter);
+        // cet event est plus precis. Il est emis selon le type de l'entry.
+        this.eventManager.emit('packify:entry:'+fileTypeError, entryPoint);
+
+        // this.$updateProgress(formaterCounter);
 
         if(formaterCounter === entry.length - 1) {
           this.eventManager.emit('packify:processEnded', this.Queue);
@@ -218,6 +221,9 @@ class Core {
         }
 
         this.eventManager.emit('packify:eachEntry', entryPoint, formaterCounter);
+
+        // this event is more precive.
+        this.eventManager.emit('packify:entry:'+fileTypeError, entryPoint);
 
         
         if(formaterCounter === entry.length - 1) {

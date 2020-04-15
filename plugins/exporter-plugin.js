@@ -42,8 +42,8 @@ class ExporterPlugin extends PluginBase {
 
         stream.on('data', function(data) {
             // process.stdout.write(data); // change process.stdout to ya-csv
-            // console.log('data chunk ?', data)
-            compiler.$updateProgress(count);
+            // compiler.$updateProgress(count);
+            console.log('file', file)
 
         });
 
