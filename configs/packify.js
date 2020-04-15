@@ -1,4 +1,4 @@
-const { formatPath } = require('../libs/helpers');
+const { formatPath } = require('@ludoows/packify/libs/helpers');
 
 const BasePackifyConfig = {
     entry: '', // or []
