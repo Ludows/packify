@@ -18,7 +18,6 @@ const BasePackifyConfig = {
         '~': 'node_modules'
     },
     resolvers: {
-        configs: [],
         plugins: []
     }
 }
