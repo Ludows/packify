@@ -1,9 +1,10 @@
-const { formatPath } = require('@ludoows/packify/libs/helpers');
+const path = require('path');
+console.log('path', path)
 
 const BasePackifyConfig = {
     entry: '', // or []
     output: {
-        pathsFragmentSkipping: [ formatPath('resources', 'assets') ],
+        pathsFragmentSkipping: [ '/resources/assets' ],
         folder: 'public',
         hash: true
     },
