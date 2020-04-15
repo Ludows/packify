@@ -140,17 +140,17 @@ class Core {
 
   }
   $startProgress(maxInt) {
-    this.Progress.start(maxInt, 0, {
+    this.options.Progress.start(maxInt, 0, {
       speed: "N/A"
     });
     return this;
   }
   $updateProgress(integer) {
-    this.Progress.update(integer);
+    this.options.Progress.update(integer);
     return this;
   }
   $stopProgress() {
-    this.Progress.stop();
+    this.options.Progress.stop();
     return this;
   }
   $init() {
@@ -163,6 +163,8 @@ class Core {
     let progress = progressPck.make();
 
     this.set('Progress', progress);
+
+    // console.log('Progress', this.options.Progress)
 
 
     let entry = this.get('entry');
@@ -189,7 +191,7 @@ class Core {
           this.$stopProgress();
           process.exit();
         }
-        this.eventManager.emit('packify:eachEntry', entryString);
+        this.eventManager.emit('packify:eachEntry', entryString, formaterCounter);
 
         this.$updateProgress(formaterCounter);
 
@@ -215,9 +217,8 @@ class Core {
           process.exit();
         }
 
-        this.eventManager.emit('packify:eachEntry', entryPoint);
+        this.eventManager.emit('packify:eachEntry', entryPoint, formaterCounter);
 
-        this.$updateProgress(formaterCounter);
         
         if(formaterCounter === entry.length - 1) {
           this.eventManager.emit('packify:processEnded', this.Queue);

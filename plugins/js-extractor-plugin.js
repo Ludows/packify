@@ -28,7 +28,7 @@ class JsExtractorPlugin extends PluginBase {
     run(compiler) {
         let eventManager = getEventManager();
 
-        eventManager.on('packify:eachEntry', (entry) => {
+        eventManager.on('packify:eachEntry', (entry, entryCounter) => {
             // console.log('entry', entry)
             // this.createModuleInfo(content);
             let graph = this.createGraph(entry);
@@ -46,6 +46,7 @@ class JsExtractorPlugin extends PluginBase {
             }
 
             compiler.queue(file);
+            compiler.$updateProgress(entryCounter);
         })
     }
     createAsset(filename) {
