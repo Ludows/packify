@@ -12,6 +12,7 @@ var Stream = require('stream');
 class ExporterPlugin extends PluginBase {
     constructor(name, opts) {
         super(name, opts)
+        this.streamer = new Stream();
         // this.deps = getListingDependenciesProject()
     }
     extensions() {
@@ -20,13 +21,13 @@ class ExporterPlugin extends PluginBase {
     run(compiler) {
         let eventManager = getEventManager();
 
-        eventManager.on('packify:processEnded', (Queue) => {
+        eventManager.on('packify:processEnded', (Queue, entryCounter) => {
             // console.log('Queue packify:processEnded', Queue)  
             for (const file in Queue) {
                 if (Queue.hasOwnProperty(file)) {
                     const element = Queue[file];
                     // console.log('element', element)
-                    this.createStreamableProcess(element)
+                    this.createStreamableProcess(element, compiler, entryCounter)
                 }
             }
         })
@@ -36,12 +37,13 @@ class ExporterPlugin extends PluginBase {
         var hash = crypto.createHash('md5').update(name).digest('hex');
         return hash;
     }
-    createStreamableProcess(file) {
-        var stream = new Stream();
+    createStreamableProcess(file, compiler, count) {
+        var stream = this.streamer;
 
         stream.on('data', function(data) {
             // process.stdout.write(data); // change process.stdout to ya-csv
             // console.log('data chunk ?', data)
+            compiler.$updateProgress(count);
 
         });
 
