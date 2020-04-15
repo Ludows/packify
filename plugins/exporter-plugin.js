@@ -13,6 +13,10 @@ var Stream = require('stream');
 
 const translator = require('../libs/translator');
 
+// a améliorer
+const path = require('path');
+const fs = require('fs');
+
 class ExporterPlugin extends PluginBase {
     constructor(name, opts) {
         super(name, opts)
@@ -32,7 +36,7 @@ class ExporterPlugin extends PluginBase {
                     const element = Queue[file];
                     // console.log('element', element)
                     let urlDest = this.getUrlDest(element, compiler.options.output);
-                    this.createStreamableProcess(element, compiler, entryCounter)
+                    this.createStreamableProcess(element, urlDest)
                 }
             }
         })
@@ -42,12 +46,23 @@ class ExporterPlugin extends PluginBase {
         var hash = crypto.createHash('md5').update(name).digest('hex');
         return hash;
     }
-    createStreamableProcess(file, compiler, count) {
+    createStreamableProcess(file, urlDest) {
         var stream = this.streamer;
 
         stream.on('data', function(data) {
             // process.stdout.write(data); // change process.stdout to ya-csv
             // compiler.$updateProgress(count);
+            if(fs.existsSync(path.dirname(urlDest)) == false) {
+                fs.mkdirSync(path.dirname(urlDest), { recursive: true })
+            }
+
+            if(fs.existsSync(urlDest) == false) {
+                fs.writeFileSync(urlDest, data)
+            }
+            else {
+                fs.writeFileSync(urlDest, '')
+                fs.writeFileSync(urlDest, data)
+            }
 
         });
 
@@ -65,7 +80,7 @@ class ExporterPlugin extends PluginBase {
             const element = skippingPartsUrl[index];
 
             if(baseDir.includes(element)) {
-                baseDir = baseDir.replace(element, optionsOutput.folder);
+                baseDir = baseDir.replace(element, path.sep+optionsOutput.folder);
                 break;
             } 
         }
