@@ -20,7 +20,7 @@ const fs = require('fs');
 class ExporterPlugin extends PluginBase {
     constructor(name, opts) {
         super(name, opts)
-        this.streamer = new Stream();
+        
         // this.deps = getListingDependenciesProject()
     }
     extensions() {
@@ -47,8 +47,7 @@ class ExporterPlugin extends PluginBase {
         return hash;
     }
     createStreamableProcess(file, urlDest) {
-        var stream = this.streamer;
-
+        var stream = new Stream();
         stream.on('data', function(data) {
             // process.stdout.write(data); // change process.stdout to ya-csv
             // compiler.$updateProgress(count);
