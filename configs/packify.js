@@ -1,10 +1,10 @@
 const path = require('path');
-console.log('path', path)
+// console.log('path', path)
 
 const BasePackifyConfig = {
     entry: '', // or []
     output: {
-        pathsFragmentSkipping: [ '/resources/assets' ],
+        pathsFragmentSkipping: [ path.sep+'resources'+ path.sep +'assets' ],
         folder: 'public',
         hash: true
     },
