@@ -1,7 +1,10 @@
+const { formatPath } = require('../libs/helpers');
+
 const BasePackifyConfig = {
     entry: '', // or []
     output: {
-        path: '',
+        pathsFragmentSkipping: [ formatPath('resources', 'assets') ],
+        folder: 'public',
         hash: true
     },
     plugins: [
