@@ -43,6 +43,7 @@ class SassPlugin extends PluginBase {
 
     }
     $initSassRuntime(...args) {
+        console.log('args options alias', args[1].alias)
         sass.render({
             file: args[0],
             outputStyle: process.env.NODE_ENV === 'development' ? 'nested' : 'compact',
@@ -52,8 +53,9 @@ class SassPlugin extends PluginBase {
                 aliasImporter(args[1].alias)
             ]
         }, function(error, result) {
+            console.log(error)
             if(error){
-                makeError(error);
+                makeError(error.message);
                 process.exit();
             }
             if(typeof args[2] === 'function') {

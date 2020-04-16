@@ -168,6 +168,12 @@ class Core {
 
     // console.log('Progress', this.options.Progress)
 
+    // getPath()
+    let keysAlias = this.options.alias;
+
+    keysAlias.forEach((folderAlias) => {
+      this.options.alias[folderAlias] = getPath(this.options.alias[folderAlias]);
+    })
 
     let entry = this.get('entry');
     let entryType = typeOf(entry);
