@@ -32,7 +32,7 @@ class SassPlugin extends PluginBase {
                         destPath: '',
                         name: getFileName(entry),
                         extension: getFileType(entry),
-                        content: res,
+                        content: res.css,
                     }
         
                     compiler.queue(file);
@@ -43,8 +43,8 @@ class SassPlugin extends PluginBase {
 
     }
     $initSassRuntime(...args) {
-        console.log('args options alias', args[1].alias)
-        sass.render({
+        // console.log('args options alias', args[1].alias)
+        let ret = sass.renderSync({
             file: args[0],
             outputStyle: process.env.NODE_ENV === 'development' ? 'nested' : 'compact',
             sourceMapEmbed: process.env.NODE_ENV === 'development' ? true : false,
@@ -52,20 +52,9 @@ class SassPlugin extends PluginBase {
             importer: [
                 aliasImporter(args[1].alias)
             ]
-        }, function(error, result) {
-            console.log(error)
-            if(error){
-                makeError(error.message);
-                process.exit();
-            }
-            if(typeof args[2] === 'function') {
-                args[2](result);
-            }
-            else {
-                makeError('no callback provided to the sass render');
-                process.exit();
-            }
         })
+
+        args[2](ret)
     }
 }
 
