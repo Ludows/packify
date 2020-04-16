@@ -57,7 +57,7 @@ class SassPlugin extends PluginBase {
                 process.exit();
             }
             if(typeof args[2] === 'function') {
-                arg[2](result);
+                args[2](result);
             }
             else {
                 makeError('no callback provided to the sass render');
