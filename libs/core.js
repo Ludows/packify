@@ -171,6 +171,8 @@ class Core {
       allDepsKeys.forEach((dep) => {
         if(keysAlias.indexOf(dep) === -1) {
           this.options.alias[dep] = getPath('node_modules', dep);
+          // support for sass :)
+          this.options.alias['~'+dep] = getPath('node_modules', dep);
         }
       })
       
