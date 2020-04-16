@@ -21,10 +21,10 @@
     "resolve": "^1.15.1",
     "cross-env": "^7.0.2",
     "pretty-error": "^2.1.1",
-    "sast": "^0.8.1",
-    "vm": "^0.1.0",
     "is-stream": "^2.0.0",
     "cli-progress": "^3.7.0",
-    "colors": "^1.4.0"
+    "colors": "^1.4.0",
+    "node-sass": "^4.13.1",
+    "node-sass-alias-importer": "^1.0.0"
   }
 }

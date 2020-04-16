@@ -109,7 +109,9 @@ class Core {
           process.exit();
         }
 
-        this.set('extensionsTriggered', unique(requiredPlugin.extensions()))
+        let all = [...unique(extensions), ...unique(requiredPlugin.extensions())]
+        // console.log('all ?', all)
+        this.set('extensionsTriggered', all)
 
         requiredPlugin.run(this);
 

@@ -28,7 +28,7 @@ class JsExtractorPlugin extends PluginBase {
     run(compiler) {
         let eventManager = getEventManager();
 
-        eventManager.on('packify:eachEntry', (entry, entryCounter) => {
+        eventManager.on('packify:entry:js', (entry, entryCounter) => {
             // console.log('entry', entry)
             // this.createModuleInfo(content);
             if(this.ID != 0) {

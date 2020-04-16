@@ -1,15 +1,14 @@
 const PluginBase = require('../libs/plugin');
 const {
     getEventManager,
-    formatPath,
-    getBasePath,
-    getDirectory,
+    makeError,
     getFileName,
     getFileType
 } = require('../libs/helpers')
 
-const sast = require('sast')
-
+const sass = require('node-sass');
+const aliasImporter = require("node-sass-alias-importer");
+ 
 class SassPlugin extends PluginBase {
     constructor(name, opts) {
         super(name, opts)
@@ -26,50 +25,46 @@ class SassPlugin extends PluginBase {
 
         exts.forEach((ext) => {
             eventManager.on('packify:entry:'+ext, (entry, entryCounter) => {
-                this.createGraph(entry)
-                
+                this.$initSassRuntime(entry, compiler.options, (res) => {
+                    
+                    let file = {
+                        src: entry,
+                        destPath: '',
+                        name: getFileName(entry),
+                        extension: getFileType(entry),
+                        content: res,
+                    }
+        
+                    compiler.queue(file);
+                    compiler.$updateProgress(entryCounter);
+                });
             })
         })
 
     }
-    createGraph(entry) {
-        const mainAsset = this.createAsset(entry);
-        const queue = [mainAsset];
-        
-        
-        // console.log('depJson', this.deps)
-
-        for (const asset of queue) {
-            // asset.mapping = {};
-            // const dirname = getDirectory(asset.filename);
-            // // console.log('have dependencies ?', asset.dependencies);
-            // asset.dependencies.forEach(relativePath => {
-
-            //     let typedModule = typeOfModule(relativePath)
-
-            //     let pathResolver = moduleResolver(typedModule, {
-            //         dirname: dirname,
-            //         relativePath: relativePath
-            //     })
-
-            //     const absolutePath = pathResolver;
-
-            //     const child = this.createAsset(absolutePath);
-
-            //     asset.mapping[relativePath] = child.id;
-            //     queue.push(child);
-            // });
-        }
-        return queue;
+    $initSassRuntime(...args) {
+        sass.render({
+            file: args[0],
+            outputStyle: process.env.NODE_ENV === 'development' ? 'nested' : 'compact',
+            sourceMapEmbed: process.env.NODE_ENV === 'development' ? true : false,
+            sourceMap: process.env.NODE_ENV === 'development' ? true : false,
+            importer: [
+                aliasImporter(args[1].alias)
+            ]
+        }, function(error, result) {
+            if(error){
+                makeError(error);
+                process.exit();
+            }
+            if(typeof args[2] === 'function') {
+                arg[2](result);
+            }
+            else {
+                makeError('no callback provided to the sass render');
+                process.exit();
+            }
+        })
     }
-    createAsset(filename) {
-        let content = readFileSync(filename);
-        let typeFile = getFileType(filename);
-
-        const ast = sast.parse(content, {syntax: typeFile})
-        console.log('ast', ast)
-    }
-    
 }
 
 module.exports = SassPlugin;
