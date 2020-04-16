@@ -10,6 +10,7 @@ const {
   unique,
   readFileSync,
   getFileType, 
+  mergeObjects,
   existFileSync,
   writeFileSync,
   getListingDependenciesProject,
@@ -155,6 +156,27 @@ class Core {
     this.options.Progress.stop();
     return this;
   }
+  $generateAliases() {
+
+    let packageRoot = JSON.parse(readFileSync(getPath('package.json')));
+    // getPath()
+    let keysAlias = Object.keys(this.options.alias);
+
+    let allDeps = mergeObjects(packageRoot.devDependencies, packageRoot.dependencies);
+
+    let allDepsKeys = Object.keys(allDeps);
+
+    keysAlias.forEach((folderAlias) => {
+      // adding resolves to node_modules.
+      allDepsKeys.forEach((dep) => {
+        if(keysAlias.indexOf(dep) === -1) {
+          this.options.alias[dep] = getPath('node_modules', dep);
+        }
+      })
+      
+      this.options.alias[folderAlias] = getPath(this.options.alias[folderAlias]);
+    })
+  }
   $init() {
     this.eventManager.emit('packify:init');
 
@@ -168,12 +190,7 @@ class Core {
 
     // console.log('Progress', this.options.Progress)
 
-    // getPath()
-    let keysAlias = this.options.alias;
-
-    keysAlias.forEach((folderAlias) => {
-      this.options.alias[folderAlias] = getPath(this.options.alias[folderAlias]);
-    })
+    this.$generateAliases();
 
     let entry = this.get('entry');
     let entryType = typeOf(entry);
