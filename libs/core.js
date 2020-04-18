@@ -26,7 +26,6 @@ class Core {
     this.options = opts;
     this.eventManager = getEventManager();
     this.Queue = {};
-    this.start();
   }
   queue(file) {
 
@@ -73,7 +72,7 @@ class Core {
     this.options[key] = value;
     return this;
   }
-  managePlugins() {
+  async managePlugins() {
     let allPluginsPath = [];
     let resolvers = this.get('resolvers');
 
@@ -91,41 +90,59 @@ class Core {
     // console.log('allLoadersPath', allLoadersPath);
     let pluginsInitialized = [];
 
-    plugins.forEach((plugin) => {
+    plugins.forEach( async (plugin) => {
       // console.log('plugin', plugin)
-      let urlPlugin = this.dependencyResolver(plugin[0] + '.js', allPluginsPath);
-      // console.log('urlPlugin', urlPlugin);
+      try {
+        
+        let urlPlugin = await this.dependencyResolver(plugin[0] + '.js', allPluginsPath);
+        
+        if (urlPlugin != null) {
+          
+          if(plugin[1] === undefined) {
+            plugin[1] = {};
+          }
 
-
-
-      if (urlPlugin != null) {
-        let requiredPlugin = new(requireFile(urlPlugin))(plugin[0], plugin[1]);
-
-        let extensions = this.get('extensionsTriggered');
-
-        let ExtensionBindedByPlugin = requiredPlugin.extensions()
-
-        if (ExtensionBindedByPlugin.length === 0) {
-          makeError('Avez vous défini une liste des extensions que votre plugin ' + plugin[0] + ' peut transformer ?');
+          let requiredPlugin = new(requireFile(urlPlugin))(plugin[0], plugin[1]);
+  
+          let extensions = this.get('extensionsTriggered');
+  
+          let ExtensionBindedByPlugin = requiredPlugin.extensions()
+  
+          if (ExtensionBindedByPlugin.length === 0) {
+            makeError('Avez vous défini une liste des extensions que votre plugin ' + plugin[0] + ' peut transformer ?');
+            process.exit();
+          }
+  
+          let all = [...unique(extensions), ...unique(requiredPlugin.extensions())]
+          // console.log('all ?', all)
+          this.set('extensionsTriggered', all)
+  
+          try {
+            
+            await requiredPlugin.run(this);
+            pluginsInitialized.push(requiredPlugin);
+  
+          } catch (error) {
+            makeError('Le plugin suivant: ' + plugin[0] + ' ne peut pas être initialisé.');
+            process.exit();
+          }
+        } else {
+          makeError('the specified plugin ' + plugin[0] + ' was not found');
           process.exit();
         }
-
-        let all = [...unique(extensions), ...unique(requiredPlugin.extensions())]
-        // console.log('all ?', all)
-        this.set('extensionsTriggered', all)
-
-        requiredPlugin.run(this);
-
-        pluginsInitialized.push(requiredPlugin);
-
-      } else {
-        makeError('the specified plugin ' + plugin[0] + ' was not found');
+      } catch (error) {
+        makeError('Unable to resolve plugin');
         process.exit();
       }
     })
-    this.set('pluginsInitialized', pluginsInitialized);
+    if(pluginsInitialized.length > 0) {
+      this.set('pluginsInitialized', pluginsInitialized);
+    }
+    else {
+      console.warning('No plugins provided')
+    }
   }
-  dependencyResolver(nameFile, arrayOfSources) {
+  async dependencyResolver(nameFile, arrayOfSources) {
     let ret = null;
     for (let index = 0; index < arrayOfSources.length; index++) {
       const source = arrayOfSources[index];
@@ -138,9 +155,7 @@ class Core {
       }
 
     }
-
     return ret;
-
   }
   $startProgress(maxInt) {
     this.options.Progress.start(maxInt, 0, {
@@ -156,7 +171,7 @@ class Core {
     this.options.Progress.stop();
     return this;
   }
-  $generateAliases() {
+  async $generateAliases() {
 
     let packageRoot = JSON.parse(readFileSync(getPath('package.json')));
     // getPath()
@@ -179,7 +194,7 @@ class Core {
       this.options.alias[folderAlias] = getPath(this.options.alias[folderAlias]);
     })
   }
-  $init() {
+  async $init() {
     this.eventManager.emit('packify:init');
 
     let progressPck = new ProgressUi({
@@ -192,7 +207,13 @@ class Core {
 
     // console.log('Progress', this.options.Progress)
 
-    this.$generateAliases();
+    try {
+      await this.$generateAliases();
+    } catch (error) {
+      makeError('Unable to generate Aliases');
+      process.exit();
+    }
+    
 
     let entry = this.get('entry');
     let entryType = typeOf(entry);
@@ -264,10 +285,10 @@ class Core {
     }
 
   }
-  start() {
+  async start() {
     this.set('extensionsTriggered', []);
-    this.managePlugins();
-    this.$init();
+    await this.managePlugins();
+    await this.$init();
   }
 }
 
