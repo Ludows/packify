@@ -37,7 +37,7 @@ function getEventManager() {
     return eventEmitter;
 }
 
-function parseFile(...args) {
+async function parseFile(...args) {
     let bufferFile = null;
     
     try {
