@@ -23,14 +23,17 @@ class JsExtractorPlugin extends PluginBase {
         return ['js']
     }
     async run(file) {
-            // console.log('entry', entry)
+            
             // this.createModuleInfo(content);
             if(this.ID != 0) {
                 this.ID = 0;
             }
-
+            console.log('started', file)
+            console.log('before graph')
             let graph = await this.createGraph(file.src);
-            let bundle = this.bundle(graph);
+            console.log('after graph')
+            let bundle = await this.bundle(graph);
+            console.log('after bundle')
 
             // console.log('bundle', bundle)
 
@@ -44,12 +47,15 @@ class JsExtractorPlugin extends PluginBase {
 
             // compiler.$updateProgress(entryCounter);
     }
+    // async parse() {
+
+    // }
     async createAsset(filename) {
         let content = await readFile(filename);
 
         // console.log('content', content);
 
-        const ast = parser.parse(content, {
+        const ast = parser.parse(content.toString(), {
             sourceType: "module"
         });
 
@@ -109,7 +115,7 @@ class JsExtractorPlugin extends PluginBase {
         }
         return queue;
     }
-    bundle(graph) {
+    async bundle(graph) {
         let modules = '';
         graph.forEach(mod => {
             modules += `${mod.id}: [

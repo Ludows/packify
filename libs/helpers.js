@@ -193,7 +193,7 @@ function readFileSync(url) {
 
 async function readFile(url) {
     try {
-      return await fs.readFile(url, 'utf-8'); 
+      return await fs.promises.readFile(url); 
     } catch (error) {
         makeError('Could not resolve your file');
         process.exit();
