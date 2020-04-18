@@ -6,6 +6,8 @@ const eventEmitter = new events.EventEmitter();
 const PrettyError = require('pretty-error');
 const pe = new PrettyError();
 const resolve = require('resolve');
+const util = require('util');
+
 
 const basePackifyConfig = require('../configs/packify');
 
@@ -41,7 +43,7 @@ async function parseFile(...args) {
     let bufferFile = null;
     
     try {
-        bufferFile = await fs.readFile(args[0])
+        bufferFile = await fs.promises.readFile(args[0])
     } catch (error) {
         makeError(' Le fichier suivant ne peut pas être parsé. '+ args[0] +' ');
         process.exit();
@@ -219,14 +221,16 @@ function getDirectory(...args) {
     return path.dirname(...args)
 }
 
-async function getListingDir(pathFile, FileTypesOpt = false) {
-    try {
-        return fs.readdir(pathFile, {withFileTypes: FileTypesOpt});
-    } catch (error) {
-        makeError(error.message);
-        process.exit();
-    }
-    
+async function getListingDir(pathFile) {
+    return new Promise((resolve, reject) => {
+        fs.readdir(pathFile, (error, files) => {
+         error ? reject(error) : resolve(files);
+        });
+    });
+}
+
+function getListingDirSync(pathFile) {
+    return fs.readdirSync(pathFile);
 }
 
 function haveSeparator(...args) {
@@ -290,6 +294,7 @@ module.exports = {
     getDirectory,
     unique,
     getListingDir,
+    getListingDirSync,
     readFile,
     readFileSync,
     getExtendOption,

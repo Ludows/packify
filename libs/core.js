@@ -113,7 +113,7 @@ class Core {
       let registeredPluginsKeys = Object.keys(registeredPlugins);
 
       for (let index = 0; index < registeredPluginsKeys.length; index++) {
-        const plugin = registeredPlugins[index];
+        const plugin = registeredPlugins[registeredPluginsKeys[index]];
         let exts = plugin.extensions();
 
         if (exts.indexOf(fileType) > -1) {
@@ -152,7 +152,7 @@ class Core {
     plugins.forEach(async (plugin) => {
       // console.log('plugin', plugin)
 
-      let urlPlugin = await this.dependencyResolver(plugin[0] + '.js', allPluginsPath);
+      let urlPlugin = this.dependencyResolver(plugin[0] + '.js');
 
       if (urlPlugin != null) {
 
@@ -186,10 +186,12 @@ class Core {
 
     })
 
-    if (pluginsInitialized.length > 0) {
+    // console.log('pluginsInitialized', pluginsInitialized)
+    var pluginsInitializedKeys = Object.keys(pluginsInitialized);
+    if (pluginsInitializedKeys.length > 0) {
       this.set('registeredPlugins', pluginsInitialized);
-    } else {
-      console.warning('No plugins provided')
+    } else if(pluginsInitializedKeys.length === 0) {
+      console.warn('No plugins provided')
     }
   }
 
@@ -210,11 +212,15 @@ class Core {
     }
 
   }
-  async dependencyResolver(nameFile, arrayOfSources) {
+  dependencyResolver(nameFile) {
+
+    let sources = this.get('registeredPathLoaders');
+    // console.log('sources', sources)
+
     let ret = null;
-    for (let index = 0; index < arrayOfSources.length; index++) {
-      const source = arrayOfSources[index];
-      let files = await getListingDir(source, false)
+    for (let index = 0; index < sources.length; index++) {
+      const source = sources[index];
+      let files = getListingDirSync(source)
       // console.log('files dependencyResolver', files)
 
       if (files.indexOf(nameFile) > -1) {
