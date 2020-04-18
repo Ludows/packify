@@ -1,17 +1,14 @@
 class BasePlugin {
-    constructor(name, opts) {
-        this.name = name;
-        this.options = opts;
-        this.done = false;
+    constructor(...args) {
+        this.name = args[0];
+        this.options = args[1];
+        this.compiler = args[2]
     }
     extensions() {
         return [];
     }
-    run(compilerInstance) {
+    run(file) {
 
-    }
-    done() {
-        this.done = true;
     }
 }
 module.exports = BasePlugin;

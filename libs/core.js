@@ -9,17 +9,21 @@ const {
   formatPath,
   unique,
   readFileSync,
-  getFileType, 
+  getFileType,
   mergeObjects,
   existFileSync,
   writeFileSync,
   getListingDependenciesProject,
-  createReadStreamFromString, 
+  createReadStreamFromString,
   createWriteStream
 } = require('./helpers');
 
 const ProgressUi = require('./progress');
 const colors = require('colors/safe');
+
+const Exporter = require('./export');
+
+
 
 class Core {
   constructor(opts) {
@@ -45,7 +49,7 @@ class Core {
   isInQueue(fileObject) {
     let ret = false;
     let QueueKeys = Object.keys(this.Queue)
-    if(QueueKeys.length > 0) {
+    if (QueueKeys.length > 0) {
       for (let index = 0; index < QueueKeys.length; index++) {
         const file = this.Queue[QueueKeys[index]];
         if (file.src === fileObject.src) {
@@ -54,7 +58,7 @@ class Core {
         }
       }
     }
-    
+
     return ret;
   }
   canBeProcessed(extension) {
@@ -72,7 +76,65 @@ class Core {
     this.options[key] = value;
     return this;
   }
-  async managePlugins() {
+
+  async generateExecutionOrder() {
+
+    let registeredPlugins = this.get('registeredPlugins');
+
+    let entry = this.get('entry');
+    let entryType = typeOf(entry);
+
+    let formater = [];
+    // let formaterCounter = 0;
+
+    // console.log('entryType', entryType)
+    if (entryType === 'string') {
+
+      formater.push(entry);
+
+    } else if (entryType === 'array') {
+
+      formater = entry;
+
+    } else {
+      makeError('Packify not support at this moment, entries as objects. Please to use array of entries or string entry');
+      process.exit();
+    }
+
+    this.$startProgress(formater.length);
+    const roadmapTasks = {};
+    formater.forEach((entryString) => {
+
+      let canBeProcessed = this.canBeProcessed(entryString);
+      let fileType = getFileType(entryString);
+
+      if (!canBeProcessed) {
+        console.log('entryString can not be processed', entryString)
+        makeError('le type ' + fileType + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
+        this.$stopProgress();
+        process.exit();
+      }
+
+      for (let index = 0; index < registeredPlugins.length; index++) {
+        const plugin = registeredPlugins[index];
+        let exts = plugin.extensions();
+
+        if (exts.indexOf(fileType) > -1) {
+
+          if (!roadmapTasks.hasOwnProperty(plugin.name)) {
+            roadmapTasks[plugin.name] = [];
+          }
+
+          if (roadmapTasks[plugin.name].indexOf(entryString) === -1) {
+            roadmapTasks[plugin.name].push(entryString);
+          }
+        }
+      }
+    })
+    this.set('roadmapTasks', roadmapTasks)
+  }
+
+  async registerPlugins() {
     let allPluginsPath = [];
     let resolvers = this.get('resolvers');
 
@@ -90,57 +152,64 @@ class Core {
     // console.log('allLoadersPath', allLoadersPath);
     let pluginsInitialized = [];
 
-    plugins.forEach( async (plugin) => {
+    plugins.forEach(async (plugin) => {
       // console.log('plugin', plugin)
-      try {
-        
-        let urlPlugin = await this.dependencyResolver(plugin[0] + '.js', allPluginsPath);
-        
-        if (urlPlugin != null) {
-          
-          if(plugin[1] === undefined) {
-            plugin[1] = {};
-          }
 
-          let requiredPlugin = new(requireFile(urlPlugin))(plugin[0], plugin[1]);
-  
-          let extensions = this.get('extensionsTriggered');
-  
-          let ExtensionBindedByPlugin = requiredPlugin.extensions()
-  
-          if (ExtensionBindedByPlugin.length === 0) {
-            makeError('Avez vous défini une liste des extensions que votre plugin ' + plugin[0] + ' peut transformer ?');
-            process.exit();
-          }
-  
-          let all = [...unique(extensions), ...unique(requiredPlugin.extensions())]
-          // console.log('all ?', all)
-          this.set('extensionsTriggered', all)
-  
-          try {
-            
-            await requiredPlugin.run(this);
-            pluginsInitialized.push(requiredPlugin);
-  
-          } catch (error) {
-            makeError('Le plugin suivant: ' + plugin[0] + ' ne peut pas être initialisé.');
-            process.exit();
-          }
-        } else {
-          makeError('the specified plugin ' + plugin[0] + ' was not found');
+      let urlPlugin = await this.dependencyResolver(plugin[0] + '.js', allPluginsPath);
+
+      if (urlPlugin != null) {
+
+        if (plugin[1] === undefined) {
+          plugin[1] = {};
+        }
+
+        let requiredPlugin = new(requireFile(urlPlugin))(plugin[0], plugin[1], this);
+
+        let extensions = this.get('extensionsTriggered');
+
+        let ExtensionBindedByPlugin = requiredPlugin.extensions()
+
+        if (ExtensionBindedByPlugin.length === 0) {
+          makeError('Avez vous défini une liste des extensions que votre plugin ' + plugin[0] + ' peut transformer ?');
           process.exit();
         }
-      } catch (error) {
-        makeError('Unable to resolve plugin');
+
+        let all = [...unique(extensions), ...unique(requiredPlugin.extensions())]
+        // console.log('all ?', all)
+        this.set('extensionsTriggered', all)
+
+        pluginsInitialized.push(requiredPlugin);
+
+      } else {
+        makeError('Unable to resolve plugin : ' + plugin[0] + '');
         process.exit();
       }
+
     })
-    if(pluginsInitialized.length > 0) {
-      this.set('pluginsInitialized', pluginsInitialized);
-    }
-    else {
+
+    if (pluginsInitialized.length > 0) {
+      this.set('registeredPlugins', pluginsInitialized);
+    } else {
       console.warning('No plugins provided')
     }
+  }
+
+  async managePlugins() {
+
+    try {
+      await this.registerPlugins();
+    } catch (error) {
+      makeError('Error, for Registrations Plugins.')
+      process.exit()
+    }
+
+    try {
+      await this.generateExecutionOrder();
+    } catch (error) {
+      makeError('Error, generateExecutionOrder fails.')
+      process.exit()
+    }
+
   }
   async dependencyResolver(nameFile, arrayOfSources) {
     let ret = null;
@@ -171,6 +240,25 @@ class Core {
     this.options.Progress.stop();
     return this;
   }
+  async $fireTasks() {
+    let roadmap = this.get('roadmapTasks');
+
+    
+  }
+  async $runtimeExport() {
+    let Queue = this.Queue;
+    
+    let Export = new Exporter(Queue);
+
+    try {
+      let stats = await Export.run();
+    } catch (error) {
+      makeError('Export can not work.');
+      process.exit();
+    }
+
+    return stats;
+  }
   async $generateAliases() {
 
     let packageRoot = JSON.parse(readFileSync(getPath('package.json')));
@@ -184,13 +272,13 @@ class Core {
     keysAlias.forEach((folderAlias) => {
       // adding resolves to node_modules.
       allDepsKeys.forEach((dep) => {
-        if(keysAlias.indexOf(dep) === -1) {
+        if (keysAlias.indexOf(dep) === -1) {
           this.options.alias[dep] = getPath('node_modules', dep);
           // support for sass :)
-          this.options.alias['~'+dep] = getPath('node_modules', dep);
+          this.options.alias['~' + dep] = getPath('node_modules', dep);
         }
       })
-      
+
       this.options.alias[folderAlias] = getPath(this.options.alias[folderAlias]);
     })
   }
@@ -213,82 +301,20 @@ class Core {
       makeError('Unable to generate Aliases');
       process.exit();
     }
-    
 
-    let entry = this.get('entry');
-    let entryType = typeOf(entry);
-
-    let formaterCounter = 0;
-    // console.log('entryType', entryType)
-
-    
-
-    if (entryType === 'string') {
-
-      let formater = [];
-      formater.push(entry);
-
-      this.$startProgress(formater.length);
-
-      formater.forEach((entryString) => {
-        let canBeProcessed = this.canBeProcessed(entryString);
-        let fileTypeError = getFileType(entryString);
-        if (!canBeProcessed) {
-          console.log('entryString can not be processed', entryString)
-          makeError('le type ' + fileTypeError + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
-          this.$stopProgress();
-          process.exit();
-        }
-        this.eventManager.emit('packify:eachEntry', entryString, formaterCounter);
-
-        // cet event est plus precis. Il est emis selon le type de l'entry.
-        this.eventManager.emit('packify:entry:'+fileTypeError, entryPoint, formaterCounter);
-
-        // this.$updateProgress(formaterCounter);
-
-        if(formaterCounter === entry.length - 1) {
-          this.eventManager.emit('packify:processEnded', this.Queue);
-        }
-        
-        formaterCounter++;
-      })
-
-    } else {
-      
-      this.$startProgress(entry.length);
-      entry.forEach((entryPoint) => {
-
-        let canBeProcessed = this.canBeProcessed(entryPoint);
-        let fileTypeError = getFileType(entryPoint);
-        
-        if (!canBeProcessed) {
-          console.log('entryString can not be processed', entryPoint)
-          makeError('le type ' + fileTypeError + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
-          this.$stopProgress();
-          process.exit();
-        }
-
-        this.eventManager.emit('packify:eachEntry', entryPoint, formaterCounter);
-
-        // this event is more precive.
-        this.eventManager.emit('packify:entry:'+fileTypeError, entryPoint, formaterCounter);
-
-        
-        if(formaterCounter === entry.length - 1) {
-          this.eventManager.emit('packify:processEnded', this.Queue);
-          this.$stopProgress();
-        }
-        
-        formaterCounter++;
-      })
-
+    try {
+      await this.$fireTasks();
+    } catch (error) {
+      makeError('Unable to fire tasks execution :(');
+      process.exit();
     }
-
   }
   async start() {
     this.set('extensionsTriggered', []);
     await this.managePlugins();
     await this.$init();
+    let Stats = await $runtimeExport();
+    return Stats;
   }
 }
 
