@@ -1,9 +1,9 @@
 const {
-  mergeConfig,
   getEventManager,
   typeOf,
   requireFile,
   getListingDir,
+  parseFile,
   makeError,
   getPath,
   formatPath,
@@ -11,11 +11,6 @@ const {
   readFileSync,
   getFileType,
   mergeObjects,
-  existFileSync,
-  writeFileSync,
-  getListingDependenciesProject,
-  createReadStreamFromString,
-  createWriteStream
 } = require('./helpers');
 
 const ProgressUi = require('./progress');
@@ -58,8 +53,10 @@ class Core {
         }
       }
     }
-
     return ret;
+  }
+  getFileObjectFromQueue(file) {
+    return this.Queue[file];
   }
   canBeProcessed(extension) {
     let ret = false;
@@ -101,7 +98,6 @@ class Core {
       process.exit();
     }
 
-    this.$startProgress(formater.length);
     const roadmapTasks = {};
     formater.forEach((entryString) => {
 
@@ -111,11 +107,12 @@ class Core {
       if (!canBeProcessed) {
         console.log('entryString can not be processed', entryString)
         makeError('le type ' + fileType + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
-        this.$stopProgress();
         process.exit();
       }
 
-      for (let index = 0; index < registeredPlugins.length; index++) {
+      let registeredPluginsKeys = Object.keys(registeredPlugins);
+
+      for (let index = 0; index < registeredPluginsKeys.length; index++) {
         const plugin = registeredPlugins[index];
         let exts = plugin.extensions();
 
@@ -150,7 +147,7 @@ class Core {
     this.set('registeredPathLoaders', allPluginsPath);
 
     // console.log('allLoadersPath', allLoadersPath);
-    let pluginsInitialized = [];
+    let pluginsInitialized = {};
 
     plugins.forEach(async (plugin) => {
       // console.log('plugin', plugin)
@@ -178,7 +175,9 @@ class Core {
         // console.log('all ?', all)
         this.set('extensionsTriggered', all)
 
-        pluginsInitialized.push(requiredPlugin);
+        if(pluginsInitialized.hasOwnProperty(requiredPlugin.name) == false) {
+          pluginsInitialized[requiredPlugin.name] = requiredPlugin;
+        }
 
       } else {
         makeError('Unable to resolve plugin : ' + plugin[0] + '');
@@ -215,7 +214,7 @@ class Core {
     let ret = null;
     for (let index = 0; index < arrayOfSources.length; index++) {
       const source = arrayOfSources[index];
-      let files = getListingDir(source, false)
+      let files = await getListingDir(source, false)
       // console.log('files dependencyResolver', files)
 
       if (files.indexOf(nameFile) > -1) {
@@ -242,13 +241,36 @@ class Core {
   }
   async $fireTasks() {
     let roadmap = this.get('roadmapTasks');
+    let plugins = this.get('registeredPlugins');
+
+    for (const pluginName in roadmap) {
+      if (roadmap.hasOwnProperty(pluginName)) {
+        const fileList = roadmap[pluginName];
+        fileList.forEach(async (file) => {
+          let isInQueue = this.isInQueue({"src": file});
+          let FileObject = null;
+          
+          if(isInQueue) {
+            fileObject = this.getFileObjectFromQueue(file);
+          }
+          else {
+            fileObject = {
+              src: file
+            }
+          }
+          
+          let returnValue = await plugins[pluginName].run(fileObject);
+          this.queue(returnValue);
+        })
+        
+      }
+    }
 
     
   }
-  async $runtimeExport() {
-    let Queue = this.Queue;
-    
-    let Export = new Exporter(Queue);
+  async $runtimeExport() {    
+
+    let Export = new Exporter(this.Queue);
 
     try {
       let stats = await Export.run();
@@ -260,8 +282,13 @@ class Core {
     return stats;
   }
   async $generateAliases() {
-
-    let packageRoot = JSON.parse(readFileSync(getPath('package.json')));
+    
+    let packageRoot = null;
+    try {
+      packageRoot = await parseFile(getPath('package.json'));
+    } catch (error) {
+      makeError('le fichier package.json ne peut pas être parsé.');
+    } 
     // getPath()
     let keysAlias = Object.keys(this.options.alias);
 
@@ -285,13 +312,13 @@ class Core {
   async $init() {
     this.eventManager.emit('packify:init');
 
-    let progressPck = new ProgressUi({
-      format: 'CLI Progress |' + colors.green('{bar}') + '| {percentage}%'
-    })
+    // let progressPck = new ProgressUi({
+    //   format: 'CLI Progress |' + colors.green('{bar}') + '| {percentage}%'
+    // })
 
-    let progress = progressPck.make();
+    // let progress = progressPck.make();
 
-    this.set('Progress', progress);
+    // this.set('Progress', progress);
 
     // console.log('Progress', this.options.Progress)
 

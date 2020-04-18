@@ -1,9 +1,6 @@
 const PluginBase = require('../libs/plugin');
 const {
-    getEventManager,
-    formatPath,
-    getBasePath,
-    readFileSync,
+    readFile,
     getFileName,
     getDirectory,
     getFileType,
@@ -17,54 +14,44 @@ const traverse = require("@babel/traverse").default; // walks through AST
 const babel = require("@babel/core"); // main babel functionality
 
 class JsExtractorPlugin extends PluginBase {
-    constructor(name, opts) {
-        super(name, opts)
+    constructor(...args) {
+        super(args[0], args[1], args[2])
         this.ID = 0;
         // this.deps = getListingDependenciesProject()
     }
     extensions() {
         return ['js']
     }
-    run(compiler) {
-        let eventManager = getEventManager();
-
-        eventManager.on('packify:entry:js', (entry, entryCounter) => {
+    async run(file) {
             // console.log('entry', entry)
             // this.createModuleInfo(content);
             if(this.ID != 0) {
                 this.ID = 0;
             }
 
-            let graph = this.createGraph(entry);
+            let graph = await this.createGraph(file.src);
             let bundle = this.bundle(graph);
 
             // console.log('bundle', bundle)
 
-            let file = {
-                src: entry,
-                destPath: '',
-                name: getFileName(entry),
-                extension: getFileType(entry),
+            return {
+                src: file.src,
+                name: getFileName(file.src),
+                extension: getFileType(file.src),
                 content: bundle,
                 graph: graph
             }
 
-            compiler.queue(file);
-            compiler.$updateProgress(entryCounter);
-        })
+            // compiler.$updateProgress(entryCounter);
     }
-    createAsset(filename) {
-        let content = readFileSync(filename);
+    async createAsset(filename) {
+        let content = await readFile(filename);
 
         // console.log('content', content);
 
         const ast = parser.parse(content, {
             sourceType: "module"
         });
-
-        
-
-        
 
         const dependencies = [];
         traverse(ast, {
@@ -77,7 +64,7 @@ class JsExtractorPlugin extends PluginBase {
         const id = this.ID++;
         const {
             code
-        } = babel.transformFromAstSync(ast, null, this.options);
+        } = await babel.transformFromAstAsync(ast, null, this.options);
 
         // if(filename.includes('default')) {
         //     console.log('code gen', code)
@@ -91,8 +78,8 @@ class JsExtractorPlugin extends PluginBase {
             code
         };
     }
-    createGraph(entry) {
-        const mainAsset = this.createAsset(entry);
+    async createGraph(entry) {
+        const mainAsset = await this.createAsset(entry);
         const queue = [mainAsset];
         
         
@@ -102,18 +89,19 @@ class JsExtractorPlugin extends PluginBase {
             asset.mapping = {};
             const dirname = getDirectory(asset.filename);
             // console.log('have dependencies ?', asset.dependencies);
-            asset.dependencies.forEach(relativePath => {
+            asset.dependencies.forEach( async (relativePath) => {
 
+                // Penser a gérer les alias
                 let typedModule = typeOfModule(relativePath)
 
-                let pathResolver = moduleResolver(typedModule, {
+                let pathResolver = await moduleResolver(typedModule, {
                     dirname: dirname,
                     relativePath: relativePath
                 })
 
                 const absolutePath = pathResolver;
 
-                const child = this.createAsset(absolutePath);
+                const child = await this.createAsset(absolutePath);
 
                 asset.mapping[relativePath] = child.id;
                 queue.push(child);

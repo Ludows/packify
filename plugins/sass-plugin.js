@@ -8,53 +8,32 @@ const {
 
 const sass = require('node-sass');
 const aliasImporter = require("node-sass-alias-importer");
- 
+
 class SassPlugin extends PluginBase {
-    constructor(name, opts) {
-        super(name, opts)
-        
-        // this.deps = getListingDependenciesProject()
+    constructor(...args) {
+        super(args[0], args[1], args[2])
     }
     extensions() {
         return ['scss', 'sass']
     }
-    run(compiler) {
-        let eventManager = getEventManager();
+    async run(file) {
 
-        let exts = this.extensions();
-
-        exts.forEach((ext) => {
-            eventManager.on('packify:entry:'+ext, (entry, entryCounter) => {
-                this.$initSassRuntime(entry, compiler.options, (res) => {
-                    
-                    let file = {
-                        src: entry,
-                        destPath: '',
-                        name: getFileName(entry),
-                        extension: getFileType(entry),
-                        content: res.css,
-                    }
-        
-                    compiler.queue(file);
-                    compiler.$updateProgress(entryCounter);
-                });
-            })
-        })
-
-    }
-    $initSassRuntime(...args) {
-        // console.log('args options alias', args[1].alias)
-        let ret = sass.renderSync({
-            file: args[0],
+        let result = await sass.render({
+            file: file.src,
             outputStyle: process.env.NODE_ENV === 'development' ? 'nested' : 'compact',
             sourceMapEmbed: process.env.NODE_ENV === 'development' ? true : false,
             sourceMap: process.env.NODE_ENV === 'development' ? true : false,
             importer: [
-                aliasImporter(args[1].alias)
+                aliasImporter(this.compiler.options.alias)
             ]
         })
 
-        args[2](ret)
+        return {
+            src: file.src,
+            name: getFileName(file.src),
+            extension: getFileType(file.src),
+            content: result.css,
+        }
     }
 }
 

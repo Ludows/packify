@@ -7,8 +7,6 @@ const PrettyError = require('pretty-error');
 const pe = new PrettyError();
 const resolve = require('resolve');
 
-const { execSync, spawnSync } = require('child_process');
-
 const basePackifyConfig = require('../configs/packify');
 
 function mergeConfig(opts) {
@@ -40,11 +38,24 @@ function getEventManager() {
 }
 
 function parseFile(...args) {
-    return JSON.parse(fs.readFileSync(...args));
+    let bufferFile = null;
+    
+    try {
+        bufferFile = await fs.readFile(args[0])
+    } catch (error) {
+        makeError(' Le fichier suivant ne peut pas être parsé. '+ args[0] +' ');
+        process.exit();
+    }
+    
+    return JSON.parse(bufferFile);
+}
+
+function parseFileSync(...args) {
+    return JSON.parse(fs.readFileSync(args[0]));
 }
 
 function requireFile(...args) {
-    return require(...args);
+    return require(args[0]);
 }
 
 function makeError(...args) {
@@ -53,19 +64,19 @@ function makeError(...args) {
     // console.log(renderedError);
 }
 
-function moduleResolver(...args) {
+async function moduleResolver(...args) {
     // console.log('...args name', args[0])
     // console.log('...args obj', args[1])
     let res;
     switch (args[0]) {
         case 'moduleName':
         case 'moduleAbsoluteResolution':
-            res = resolve.sync(args[1].relativePath, { basedir: getPath('node_modules') })
+            res = await resolve(args[1].relativePath, { basedir: getPath('node_modules') })
             // console.log('res', res)
             break;
         case 'dependencyAbsoluteResolution':
         case 'dependencyRelativeResolution':
-            res = resolve.sync(args[1].relativePath, { basedir: args[1].dirname })
+            res = await resolve(args[1].relativePath, { basedir: args[1].dirname })
             // console.log('res', res)
             break;
     
@@ -178,6 +189,16 @@ function readFileSync(url) {
     return fs.readFileSync(url, 'utf-8');
 }
 
+async function readFile(url) {
+    try {
+      return await fs.readFile(url, 'utf-8'); 
+    } catch (error) {
+        makeError('Could not resolve your file');
+        process.exit();
+    }
+    
+}
+
 function getFileType(...args) {
     return path.extname(...args).substr(1);
 }
@@ -198,8 +219,14 @@ function getDirectory(...args) {
     return path.dirname(...args)
 }
 
-function getListingDir(pathFile, FileTypesOpt = false) {
-    return fs.readdirSync(pathFile, {withFileTypes: FileTypesOpt});
+async function getListingDir(pathFile, FileTypesOpt = false) {
+    try {
+        return fs.readdir(pathFile, {withFileTypes: FileTypesOpt});
+    } catch (error) {
+        makeError(error.message);
+        process.exit();
+    }
+    
 }
 
 function haveSeparator(...args) {
@@ -240,6 +267,7 @@ function getExtendOption() {
 }
 
 module.exports = {
+    parseFileSync,
     moduleResolver,
     haveSeparator,
     createReadStream,
@@ -262,6 +290,7 @@ module.exports = {
     getDirectory,
     unique,
     getListingDir,
+    readFile,
     readFileSync,
     getExtendOption,
     isRelativePath,
