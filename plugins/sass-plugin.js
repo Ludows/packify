@@ -30,21 +30,28 @@ class SassPlugin extends PluginBase {
 
         console.log('started sass', file)
 
-        // let options = mergeObjects(this.options, file);
+        let options = mergeObjects(this.options, file);
 
-        // console.log('options', options)
+        console.log('options', options)
 
-        // let result = await sass.render(options)
+        let result = null;
+        try {
+            result = await sass.render(options)
+            console.log('result', result)
+        } catch (error) {
+            console.log('error sass', error)
+        }
+        
 
-        // console.log('result', result)
+        
 
-        // return {
-        //     src: file.src,
-        //     name: getFileName(file.src),
-        //     extension: getFileType(file.src),
-        //     content: result.css,
-        //     map: process.env.NODE_ENV === 'development' ? result.map : null
-        // }
+        return {
+            src: file.src,
+            name: getFileName(file.src),
+            extension: getFileType(file.src),
+            content: result.css,
+            map: process.env.NODE_ENV === 'development' ? result.map : null
+        }
     }
 }
 
