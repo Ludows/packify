@@ -10,6 +10,7 @@ const {
   formatPath,
   unique,
   readFileSync,
+  existFileSync,
   getFileType,
   mergeObjects,
 } = require('./helpers');
@@ -220,11 +221,11 @@ class Core {
 
     let ret = null;
     for (let index = 0; index < sources.length; index++) {
-      const source = sources[index];
-      let files = getListingDirSync(source)
+      const source = formatPath(sources[index], nameFile);
+      
       // console.log('files dependencyResolver', files)
 
-      if (files.indexOf(nameFile) > -1) {
+      if (existFileSync(source)) {
         ret = formatPath(source, nameFile);
         break;
       }
