@@ -3,6 +3,7 @@ const {
   typeOf,
   requireFile,
   getListingDir,
+  getListingDirSync,
   parseFile,
   makeError,
   getPath,
@@ -186,7 +187,7 @@ class Core {
 
     })
 
-    // console.log('pluginsInitialized', pluginsInitialized)
+    console.log('pluginsInitialized', pluginsInitialized)
     var pluginsInitializedKeys = Object.keys(pluginsInitialized);
     if (pluginsInitializedKeys.length > 0) {
       this.set('registeredPlugins', pluginsInitialized);
