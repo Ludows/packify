@@ -222,15 +222,14 @@ class Core {
     let ret = null;
     for (let index = 0; index < sources.length; index++) {
       const source = formatPath(sources[index], nameFile);
-      
-      // console.log('files dependencyResolver', files)
 
-      if (existFileSync(source)) {
-        ret = formatPath(source, nameFile);
+      if (existFileSync(source) == true) {
+        ret = source;
         break;
       }
 
     }
+    // console.log('ret', ret)
     return ret;
   }
   $startProgress(maxInt) {
