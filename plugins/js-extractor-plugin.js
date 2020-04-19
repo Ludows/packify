@@ -1,4 +1,4 @@
-const PluginBase = require('../libs/plugin');
+const PluginBase = require('@ludoows/packify/libs/plugin');
 const {
     readFile,
     getFileName,
@@ -7,7 +7,7 @@ const {
     getListingDir,
     typeOfModule,
     moduleResolver
-} = require('../libs/helpers')
+} = require('@ludoows/packify/libs/helpers')
 
 const parser = require("babylon"); // parses and returns AST
 const traverse = require("@babel/traverse").default; // walks through AST

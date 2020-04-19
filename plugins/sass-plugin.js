@@ -1,10 +1,10 @@
-const PluginBase = require('../libs/plugin');
+const PluginBase = require('@ludoows/packify/libs/plugin');
 const {
     makeError,
     getFileName,
     getFileType,
     mergeObjects
-} = require('../libs/helpers')
+} = require('@ludoows/packify/libs/helpers')
 
 const sass = require('node-sass');
 const aliasImporter = require("node-sass-alias-importer");
@@ -30,21 +30,21 @@ class SassPlugin extends PluginBase {
 
         console.log('started sass', file)
 
-        let options = mergeObjects(this.options, file);
+        // let options = mergeObjects(this.options, file);
 
-        console.log('options', options)
+        // console.log('options', options)
 
-        let result = await sass.render(options)
+        // let result = await sass.render(options)
 
-        console.log('result', result)
+        // console.log('result', result)
 
-        return {
-            src: file.src,
-            name: getFileName(file.src),
-            extension: getFileType(file.src),
-            content: result.css,
-            map: process.env.NODE_ENV === 'development' ? result.map : null
-        }
+        // return {
+        //     src: file.src,
+        //     name: getFileName(file.src),
+        //     extension: getFileType(file.src),
+        //     content: result.css,
+        //     map: process.env.NODE_ENV === 'development' ? result.map : null
+        // }
     }
 }
 

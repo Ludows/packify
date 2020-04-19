@@ -151,10 +151,12 @@ class Core {
     // console.log('allLoadersPath', allLoadersPath);
     let pluginsInitialized = {};
 
-    plugins.forEach(async (plugin) => {
-      // console.log('plugin', plugin)
+    let self = this;
 
-      let urlPlugin = this.dependencyResolver(plugin[0] + '.js');
+    let plugins_promises = plugins.map( async ( plugin ) => { return await setPlugin(plugin) })
+    
+    function setPlugin(plugin) {
+      let urlPlugin = self.dependencyResolver(plugin[0] + '.js');
 
       if (urlPlugin != null) {
 
@@ -162,9 +164,9 @@ class Core {
           plugin[1] = {};
         }
 
-        let requiredPlugin = new(requireFile(urlPlugin))(plugin[0], plugin[1], this);
+        let requiredPlugin = new(require(urlPlugin))(plugin[0], plugin[1], self);
 
-        let extensions = this.get('extensionsTriggered');
+        let extensions = self.get('extensionsTriggered');
 
         let ExtensionBindedByPlugin = requiredPlugin.extensions()
 
@@ -175,7 +177,7 @@ class Core {
 
         let all = [...unique(extensions), ...unique(requiredPlugin.extensions())]
         // console.log('all ?', all)
-        this.set('extensionsTriggered', all)
+        self.set('extensionsTriggered', all)
 
         if(pluginsInitialized.hasOwnProperty(requiredPlugin.name) == false) {
           pluginsInitialized[requiredPlugin.name] = requiredPlugin;
@@ -186,7 +188,15 @@ class Core {
         process.exit();
       }
 
-    })
+      return plugin[0];
+    }
+
+    try {
+      let resultPromises = await Promise.all( plugins_promises )
+      console.log('resultPromises', resultPromises)
+    } catch (error) {
+      console.log('error error error error', error)
+    }
 
     console.log('pluginsInitialized', pluginsInitialized)
     var pluginsInitializedKeys = Object.keys(pluginsInitialized);
@@ -200,15 +210,19 @@ class Core {
   async managePlugins() {
 
     try {
+      console.log('enter registerPlugins')
       await this.registerPlugins();
     } catch (error) {
+      console.log('error registerPlugins', error)
       makeError('Error, for Registrations Plugins.')
       process.exit()
     }
 
     try {
+      console.log('enter generateExecutionOrder')
       await this.generateExecutionOrder();
     } catch (error) {
+      console.log('error generateExecutionOrder', error)
       makeError('Error, generateExecutionOrder fails.')
       process.exit()
     }
@@ -278,9 +292,9 @@ class Core {
   async $getDatasPlugin(fileList) {
     let tableau_promesses = fileList.map(async (file) => { return await this.$getResponsePlugin(file) });
 
-    // console.log('tableau_promesses ?', tableau_promesses)
+    console.log('tableau_promesses ?', tableau_promesses)
 
-    // console.log('before promises return')
+    console.log('before promises return')
 
     let resultPromise = await Promise.all( tableau_promesses );
     return resultPromise
@@ -385,15 +399,19 @@ class Core {
     // console.log('Progress', this.options.Progress)
 
     try {
+      console.log('generateAliases enter')
       await this.$generateAliases();
     } catch (error) {
+      console.log('generateAliases error', error)
       makeError('Unable to generate Aliases');
       process.exit();
     }
 
     try {
+      console.log('fireTasks enter')
       await this.$fireTasks();
     } catch (error) {
+      console.log('fireTasks error', error)
       makeError('Unable to fire tasks execution :(');
       process.exit();
     }
