@@ -30,7 +30,9 @@ class SassPlugin extends PluginBase {
 
         return new Promise((resolve,reject) => {
             console.log('started sass', file)
-            let options = mergeObjects(this.options, file);
+            let the_file = { 'file' : file.src }
+            let options = mergeObjects(this.options, the_file);
+            // console.log('options', options)
                 sass.render(options, function(err, result) {
                     if(err)
                     return reject(err)

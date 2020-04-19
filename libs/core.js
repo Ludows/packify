@@ -210,6 +210,15 @@ class Core {
   async managePlugins() {
 
     try {
+      console.log('generateAliases enter')
+      await this.$generateAliases();
+    } catch (error) {
+      console.log('generateAliases error', error)
+      makeError('Unable to generate Aliases');
+      process.exit();
+    }
+
+    try {
       console.log('enter registerPlugins')
       await this.registerPlugins();
     } catch (error) {
@@ -349,12 +358,13 @@ class Core {
   
   }
   async $runtimeExport() {    
-
-    let Export = new Exporter(this.Queue);
-
+    console.log('export started');
+    let Export = new Exporter(this.Queue, this);
+    console.log('after instance export');
     try {
       let stats = await Export.run();
     } catch (error) {
+      console.log('exporter error', error)
       makeError('Export can not work.');
       process.exit();
     }
@@ -403,15 +413,6 @@ class Core {
     // console.log('Progress', this.options.Progress)
 
     try {
-      console.log('generateAliases enter')
-      await this.$generateAliases();
-    } catch (error) {
-      console.log('generateAliases error', error)
-      makeError('Unable to generate Aliases');
-      process.exit();
-    }
-
-    try {
       console.log('fireTasks enter')
       await this.$fireTasks();
     } catch (error) {
@@ -424,7 +425,7 @@ class Core {
     this.set('extensionsTriggered', []);
     await this.managePlugins();
     await this.$init();
-    let Stats = await $runtimeExport();
+    let Stats = await this.$runtimeExport();
     return Stats;
   }
 }
