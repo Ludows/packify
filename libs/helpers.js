@@ -1,4 +1,4 @@
-const merge = require('deepmerge');
+const merge = require('merge');
 const path = require('path');
 const fs = require('fs');
 const events = require('events');

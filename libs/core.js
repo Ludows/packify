@@ -296,8 +296,12 @@ class Core {
 
     console.log('before promises return')
 
-    let resultPromise = await Promise.all( tableau_promesses );
-    return resultPromise
+    try {
+      let resultPromise = await Promise.all( tableau_promesses );
+      return resultPromise
+    } catch (error) {
+      console.log('error error error error error', error)
+    }
   }
 
   async $fireTasks() {
