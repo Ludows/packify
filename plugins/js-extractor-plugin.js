@@ -19,6 +19,12 @@ class JsExtractorPlugin extends PluginBase {
         this.ID = 0;
         // this.deps = getListingDependenciesProject()
     }
+    getDefaults() {
+        return {
+            presets: ['env'],
+            sourceMaps: process.env.NODE_ENV === 'development' ? "both" : false
+        }
+    }
     extensions() {
         return ['js']
     }
@@ -28,12 +34,12 @@ class JsExtractorPlugin extends PluginBase {
             if(this.ID != 0) {
                 this.ID = 0;
             }
-            console.log('started', file)
-            console.log('before graph')
+            // console.log('started', file)
+            // console.log('before graph')
             let graph = await this.createGraph(file.src);
-            console.log('after graph')
+            // console.log('after graph')
             let bundle = await this.bundle(graph);
-            console.log('after bundle')
+            // console.log('after bundle')
 
             // console.log('bundle', bundle)
 

@@ -1,13 +1,19 @@
+const { mergeObjects } = require('./helpers')
 class BasePlugin {
     constructor(...args) {
         this.name = args[0];
-        this.options = args[1];
+        this.options = mergeObjects(this.getDefaults(), args[1]);
         this.compiler = args[2]
+    }
+    getDefaults() {
+        return {
+
+        }
     }
     extensions() {
         return [];
     }
-    run(file) {
+    async run(file) {
 
     }
 }

@@ -74,12 +74,12 @@ function moduleResolver(...args) {
         case 'moduleName':
         case 'moduleAbsoluteResolution':
             res = resolve.sync(args[1].relativePath, { basedir: getPath('node_modules') })
-            console.log('res', res)
+            // console.log('res', res)
             break;
         case 'dependencyAbsoluteResolution':
         case 'dependencyRelativeResolution':
             res = resolve.sync(args[1].relativePath, { basedir: args[1].dirname })
-            console.log('res', res)
+            // console.log('res', res)
             break;
     
         default:
