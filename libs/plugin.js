@@ -1,4 +1,4 @@
-const { mergeObjects } = require('./helpers')
+const { mergeObjects } = require('@ludoows/packify/libs/helpers')
 class BasePlugin {
     constructor(...args) {
         this.name = args[0];

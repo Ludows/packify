@@ -1,6 +1,6 @@
 const cliProgress = require('cli-progress');
 
-const { mergeObjects } = require('./helpers')
+const { mergeObjects } = require('@ludoows/packify/libs/helpers')
 
 const baseConfProgress = {
     barCompleteChar: '\u2588',

@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 var Stream = require('stream');
 
-const translator = require('./translator');
+const translator = require('@ludoows/packify/libs/translator');
 
 // a améliorer
 const path = require('path');
