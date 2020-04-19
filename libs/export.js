@@ -3,6 +3,14 @@ var Stream = require('stream');
 
 const translator = require('@ludoows/packify/libs/translator');
 
+
+const {
+  getFileType,
+  getFileName,
+  getDirectory,
+  formatPath
+} = require('@ludoows/packify/libs/helpers');
+
 // a améliorer
 const path = require('path');
 const fs = require('fs');
