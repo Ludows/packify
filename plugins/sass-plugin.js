@@ -28,30 +28,22 @@ class SassPlugin extends PluginBase {
     }
     async run(file) {
 
-        console.log('started sass', file)
+        return new Promise((resolve,reject) => {
+            console.log('started sass', file)
+            let options = mergeObjects(this.options, file);
+                sass.render(options, function(err, result) {
+                    if(err)
+                    return reject(err)
 
-        let options = mergeObjects(this.options, file);
-
-        console.log('options', options)
-
-        let result = null;
-        try {
-            result = await sass.render(options)
-            console.log('result', result)
-        } catch (error) {
-            console.log('error sass', error)
-        }
-        
-
-        
-
-        return {
-            src: file.src,
-            name: getFileName(file.src),
-            extension: getFileType(file.src),
-            content: result.css,
-            map: process.env.NODE_ENV === 'development' ? result.map : null
-        }
+                    resolve({
+                        src: file.src,
+                        name: getFileName(file.src),
+                        extension: getFileType(file.src),
+                        content: result.css,
+                        map: process.env.NODE_ENV === 'development' ? result.map : null
+                    })
+                })
+        })
     }
 }
 
