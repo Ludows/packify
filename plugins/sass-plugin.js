@@ -18,22 +18,24 @@ class SassPlugin extends PluginBase {
     }
     async run(file) {
 
-        let result = await sass.render({
-            file: file.src,
-            outputStyle: process.env.NODE_ENV === 'development' ? 'nested' : 'compact',
-            sourceMapEmbed: process.env.NODE_ENV === 'development' ? true : false,
-            sourceMap: process.env.NODE_ENV === 'development' ? true : false,
-            importer: [
-                aliasImporter(this.compiler.options.alias)
-            ]
-        })
+        console.log('started sass', file)
 
-        return {
-            src: file.src,
-            name: getFileName(file.src),
-            extension: getFileType(file.src),
-            content: result.css,
-        }
+        // let result = await sass.render({
+        //     file: file.src,
+        //     outputStyle: process.env.NODE_ENV === 'development' ? 'nested' : 'compact',
+        //     sourceMapEmbed: process.env.NODE_ENV === 'development' ? true : false,
+        //     sourceMap: process.env.NODE_ENV === 'development' ? true : false,
+        //     importer: [
+        //         aliasImporter(this.compiler.options.alias)
+        //     ]
+        // })
+
+        // return {
+        //     src: file.src,
+        //     name: getFileName(file.src),
+        //     extension: getFileType(file.src),
+        //     content: result.css,
+        // }
     }
 }
 

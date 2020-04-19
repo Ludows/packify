@@ -245,34 +245,89 @@ class Core {
     this.options.Progress.stop();
     return this;
   }
+
+  async $getResponsePlugin(file) {
+    // console.log('list')
+    let plugins = this.get('registeredPlugins');
+    let isInQueue = this.isInQueue({"src": file});
+    let fileObject = {
+      src: file
+    }
+    // console.log('isInQueue', isInQueue)
+
+    if(isInQueue) {
+      fileObject = this.getFileObjectFromQueue(file);
+    }
+
+    let pluginName = this.get('pluginName');
+
+    // return new Promise((resolve, reject) => {
+      // console.log('passed ?')
+      try {
+        let fetchResp = await plugins[pluginName].run(fileObject);
+        this.queue(fetchResp);
+        return fetchResp;
+      } catch (error) {
+        // console.log(error)
+        makeError('Unable to run task', error)
+        process.exit();
+      }      
+  }
+  
+  async $getDatasPlugin(fileList) {
+    let tableau_promesses = fileList.map(async (file) => { return await this.$getResponsePlugin(file) });
+
+    // console.log('tableau_promesses ?', tableau_promesses)
+
+    // console.log('before promises return')
+
+    let resultPromise = await Promise.all( tableau_promesses );
+    return resultPromise
+  }
+
   async $fireTasks() {
     let roadmap = this.get('roadmapTasks');
     let plugins = this.get('registeredPlugins');
 
-    for (const pluginName in roadmap) {
-      if (roadmap.hasOwnProperty(pluginName)) {
-        const fileList = roadmap[pluginName];
-        fileList.forEach(async (file) => {
-          let isInQueue = this.isInQueue({"src": file});
-          let FileObject = null;
-          
-          if(isInQueue) {
-            fileObject = this.getFileObjectFromQueue(file);
-          }
-          else {
-            fileObject = {
-              src: file
-            }
-          }
-          
-          let returnValue = await plugins[pluginName].run(fileObject);
-          this.queue(returnValue);
-        })
-        
+    // console.log('roadmap', roadmap)
+
+    var self = this;
+
+
+    let roadmapKeys = Object.keys(roadmap);
+    let indexStart = 0;
+
+    // console.log('roadmapKeys l', roadmapKeys.length)
+
+    async function loadAllTransformations(index) {
+      let pluginName = roadmapKeys[index];
+      const fileList = roadmap[pluginName];
+      // console.log('fileList', fileList)
+      self.set('pluginName', pluginName)
+      console.log('before await', )
+      
+      try {
+        let responses = await self.$getDatasPlugin(fileList)
+        console.log('responses', responses)
+      } catch (error) {
+        console.log('error', error)
       }
+      
+      console.log('after await')
+      
+      
+    }
+    await loadAllTransformations(indexStart);
+    console.log('after one')
+
+    if(indexStart <= roadmapKeys.length - 1) {
+      console.log('continue other tasks');
+      indexStart++;
+      await loadAllTransformations(indexStart);
     }
 
-    
+    console.log('all tasks executed')
+  
   }
   async $runtimeExport() {    
 

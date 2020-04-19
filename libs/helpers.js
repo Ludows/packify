@@ -66,20 +66,20 @@ function makeError(...args) {
     // console.log(renderedError);
 }
 
-async function moduleResolver(...args) {
+function moduleResolver(...args) {
     // console.log('...args name', args[0])
     // console.log('...args obj', args[1])
-    let res;
+    let res = null;
     switch (args[0]) {
         case 'moduleName':
         case 'moduleAbsoluteResolution':
-            res = await resolve(args[1].relativePath, { basedir: getPath('node_modules') })
-            // console.log('res', res)
+            res = resolve.sync(args[1].relativePath, { basedir: getPath('node_modules') })
+            console.log('res', res)
             break;
         case 'dependencyAbsoluteResolution':
         case 'dependencyRelativeResolution':
-            res = await resolve(args[1].relativePath, { basedir: args[1].dirname })
-            // console.log('res', res)
+            res = resolve.sync(args[1].relativePath, { basedir: args[1].dirname })
+            console.log('res', res)
             break;
     
         default:
@@ -195,6 +195,7 @@ async function readFile(url) {
     try {
       return await fs.promises.readFile(url); 
     } catch (error) {
+        console.log('error ?', error)
         makeError('Could not resolve your file');
         process.exit();
     }

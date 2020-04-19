@@ -95,25 +95,33 @@ class JsExtractorPlugin extends PluginBase {
             asset.mapping = {};
             const dirname = getDirectory(asset.filename);
             // console.log('have dependencies ?', asset.dependencies);
-            asset.dependencies.forEach( async (relativePath) => {
+            let dependencies_promesses = asset.dependencies.map(async (relativePath) => { return this.mergingDeps(relativePath, queue, asset, dirname) });
 
-                // Penser a gérer les alias
-                let typedModule = typeOfModule(relativePath)
+            // console.log('dependencies_promesses', dependencies_promesses)
 
-                let pathResolver = await moduleResolver(typedModule, {
-                    dirname: dirname,
-                    relativePath: relativePath
-                })
+            let Results = await Promise.all( dependencies_promesses )
 
-                const absolutePath = pathResolver;
-
-                const child = await this.createAsset(absolutePath);
-
-                asset.mapping[relativePath] = child.id;
-                queue.push(child);
-            });
+            // console.log('Results', Results)
         }
         return queue;
+    }
+    async mergingDeps(relativePath, queue, asset, dirname) {
+        let typedModule = typeOfModule(relativePath)
+        // console.log('typedModule', typedModule)
+
+        let pathResolver =  moduleResolver(typedModule, {
+            dirname: dirname,
+            relativePath: relativePath
+        })
+
+        // console.log('pathResolver ?', pathResolver)
+
+        const absolutePath = pathResolver;
+
+        const child = await this.createAsset(absolutePath);
+
+        asset.mapping[relativePath] = child.id;
+        queue.push(child);
     }
     async bundle(graph) {
         let modules = '';
