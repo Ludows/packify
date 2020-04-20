@@ -25,6 +25,7 @@
     "colors": "^1.4.0",
     "node-sass": "^4.13.1",
     "node-sass-alias-importer": "^1.0.0",
-    "merge": "^1.2.1"
+    "merge": "^1.2.1",
+    "console-table-printer": "^1.4.1"
   }
 }

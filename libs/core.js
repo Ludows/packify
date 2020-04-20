@@ -359,7 +359,7 @@ class Core {
   }
   async $runtimeExport() {    
     console.log('export started');
-    let Export = new Exporter(this.Queue, this);
+    let Export = new Exporter(this);
     console.log('after instance export');
     try {
       let stats = await Export.run();
