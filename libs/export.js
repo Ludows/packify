@@ -32,44 +32,45 @@ class Exporter {
     let all_promesses = QueueKeys.map(async (file) => {
       return await this.$runFileProcess(file);
     });
-    
-    var all = Promise.all(
-      all_promesses
-    ).then(result => {
-      result.forEach((res) => {
+
+    try {
+      
+      var results = await Promise.all( all_promesses );
+      
+      results.forEach((result) => {
         OutputTable.addRow(
-          res,
+          result,
           { color: 'green' }
         );
       })
+
+      
       OutputTable.printTable();
-    })
-    .catch((error) => {
+
+    } catch (error) {
       console.log('error', error)
       makeError('Unable to create files', error)
-    })
-
-
-
-
-    // for (const file in this.Queue) {
-    //     if (this.Queue.hasOwnProperty(file)) {
-    //       const element = this.Queue[file];
-    //       // console.log('element', element)
-    //       let urlDest = await this.getUrlDest(element, this.Compiler.options.output);
-    //       await this.createStreamableProcess(element, urlDest)
-    //     }
-    //   }
+    }
+    
   }
   async $runFileProcess(element) {
     let urlDest = await this.getUrlDest(element, this.Compiler.options.output);
+    let objectReturn = { source: file , dest: urlDest }
     await this.createStreamableProcess(element, urlDest)
 
-    return { source: file , dest: urlDest }
+    if(this.Compiler.options.output.hash) {
+      let theHash = await this.createHash(element);
+      objectReturn = { source: file , compiled: urlDest, hash:theHash }
+    }
+
+    return objectReturn
   }
   async createHash(name) {
     var hash = crypto.createHash('md5').update(name).digest('hex');
     return hash;
+  }
+  async createManifest() {
+
   }
   async createStreamableProcess(file, urlDest) {
     var stream = new Stream();

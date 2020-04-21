@@ -14,6 +14,9 @@ const BasePackifyConfig = {
         }],
         ['sass-plugin', {}]
     ],
+    hooks: {
+
+    },
     alias: {
         '~': 'node_modules'
     },
