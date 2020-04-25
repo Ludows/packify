@@ -14,7 +14,8 @@ class PostCssPlugin extends PluginBase {
     getDefaults() {
         return {
             nano: false,
-            autoprefixer: false
+            autoprefixer: false,
+            initial: false
         }
     }
     extensions() {
@@ -22,21 +23,33 @@ class PostCssPlugin extends PluginBase {
     }
     async run(file) {
         var res = undefined;
+        var depsPostCss = [];
+
         if(this.options.nano != false) {
-            res = await postcss([ require('nano')(this.options.nano) ]).process(file.content.toString());
-            file.content = res.css;
+            depsPostCss.push(
+                require('nano')(this.options.nano)
+            );
         }
 
         if(this.options.autoprefixer != false) {
-            res = await postcss([ require('autoprefixer')(this.options.autoprefixer) ]).process(file.content.toString());
-            file.content = res.css;
+            depsPostCss.push(
+                require('autoprefixer')(this.options.autoprefixer)
+            );
         }
+
+        if(this.options.initial != false) {
+            depsPostCss.push(
+                require('postcss-initial')(this.options.initial)
+            );           
+        }
+
+        res = await postcss( depsPostCss ).process(file.content.toString());
 
         return {
             src: file.src,
             name: getFileName(file.src),
             extension: getFileType(file.src),
-            content: file.content        
+            content: res.css      
         }
 
     }
