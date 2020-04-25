@@ -1,7 +1,8 @@
 const crypto = require('crypto');
-var Stream = require('stream');
 
 const translator = require('@ludoows/packify/libs/translator');
+const prettier = require("prettier");
+
 
 
 const {
@@ -69,30 +70,21 @@ class Exporter {
     var hash = crypto.createHash('md5').update(name).digest('hex');
     return hash;
   }
-  async createManifest() {
-
-  }
   async createStreamableProcess(file, urlDest) {
-    var stream = new Stream();
-    stream.on('data', function (data) {
-      // process.stdout.write(data); // change process.stdout to ya-csv
-      // compiler.$updateProgress(count);
       if (fs.existsSync(path.dirname(urlDest)) == false) {
         fs.mkdirSync(path.dirname(urlDest), {
           recursive: true
         })
       }
 
+      var prettyCode = prettier.format(file.content.toString(), { semi: true, parser: "babel" });
+
       if (fs.existsSync(urlDest) == false) {
-        fs.writeFileSync(urlDest, data)
+        fs.writeFileSync(urlDest, prettyCode)
       } else {
         fs.writeFileSync(urlDest, '')
-        fs.writeFileSync(urlDest, data)
+        fs.writeFileSync(urlDest, prettyCode)
       }
-
-    });
-
-    stream.emit('data', file.content);
   }
   async getUrlDest(file, optionsOutput) {
     let skippingPartsUrl = optionsOutput.pathsFragmentSkipping

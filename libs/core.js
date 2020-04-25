@@ -35,6 +35,10 @@ class Core {
       process.exit();
     }
 
+    if(file.content) {
+      file.content = Buffer.from(file.content,'utf-8');
+    }
+
     if (this.isInQueue(file) === false) {
       this.Queue[file.src] = file
     } else {
