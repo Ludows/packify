@@ -11,9 +11,15 @@ export default class PackifyHooks extends Hookable {
       async $registrationHooks(hooksToRegister) {
         let Keys = Object.keys(hooksToRegister);
 
-        let allPromises = Keys.map(async (key) => { return await registrationHooksHandler(key, hooksToRegister[key]); })
+        if(Keys.length > 0) {
+          let allPromises = Keys.map(async (key) => { return await registrationHooksHandler(key, hooksToRegister[key]); })
 
-        let res = await Promise.all( allPromises );
+          let res = await Promise.all( allPromises );
+          return res;
+        }
+        else {
+          return [];
+        }
       }
       async $registrationHooksHandler(hookName, handler) {
         if(typeOf(handler) != 'function') {

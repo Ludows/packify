@@ -12,11 +12,13 @@ const BasePackifyConfig = {
         ['js-extractor-plugin', {
             presets: ['env']
         }],
-        ['sass-plugin', {}]
+        ['sass-plugin', {}],
+        ['postcss-plugin', {
+            flexbox: "no-2009"
+        }],
+        ['js-terser-plugin', {}]
     ],
-    hooks: {
-
-    },
+    hooks: {},
     alias: {
         '~': 'node_modules'
     },
