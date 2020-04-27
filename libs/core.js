@@ -1,5 +1,4 @@
 const {
-  getEventManager,
   typeOf,
   requireFile,
   getListingDir,
@@ -27,7 +26,6 @@ const Hookable = require('@ludoows/packify/libs/hookable').default;
 class Core {
   constructor(opts) {
     this.options = opts;
-    this.eventManager = getEventManager();
     this.Queue = {};
     this.Hookable = new Hookable();
   }
