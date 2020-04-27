@@ -1,7 +1,10 @@
-import Hookable from 'hookable'
+const Hookable = require('Hookable');
 
-import { typeOf, makeError } from '@ludoows/packify/helpers';
-export default class PackifyHooks extends Hookable {
+console.log('Hookable', Hookable)
+
+const { makeError, typeOf } = require('@ludoows/packify/libs/helpers')
+
+class PackifyHooks extends Hookable {
     constructor() {
         // Call to parent to initialize
         super()
@@ -34,4 +37,6 @@ export default class PackifyHooks extends Hookable {
         return hookName+' registered';
       }
 }
+
+module.exports = PackifyHooks;
 
