@@ -19,7 +19,7 @@ const colors = require('colors/safe');
 
 const Exporter = require('@ludoows/packify/libs/export');
 
-const Hookable = require('@ludoows/packify/libs/hookable');
+const MyHookable = require('@ludoows/packify/libs/hookable');
 
 
 
@@ -27,7 +27,7 @@ class Core {
   constructor(opts) {
     this.options = opts;
     this.Queue = {};
-    this.Hookable = Hookable();
+    this.Hookable = new MyHookable();
   }
   queue(file) {
 

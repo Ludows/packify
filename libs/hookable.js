@@ -1,4 +1,4 @@
-const Hookable = require('Hookable');
+const Hookable = require('hookable/dist/hookable');
 
 console.log('Hookable', Hookable)
 
