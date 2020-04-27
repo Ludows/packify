@@ -15,10 +15,12 @@ const {
   mergeObjects,
 } = require('./helpers');
 
-const ProgressUi = require('./progress');
+const ProgressUi = require('@ludoows/packify/libs/progress');
 const colors = require('colors/safe');
 
-const Exporter = require('./export');
+const Exporter = require('@ludoows/packify/libs/export');
+
+const Hookable = require('@ludoows/packify/libs/hookable').default;
 
 
 
@@ -27,6 +29,7 @@ class Core {
     this.options = opts;
     this.eventManager = getEventManager();
     this.Queue = {};
+    this.Hookable = new Hookable();
   }
   queue(file) {
 
@@ -212,6 +215,15 @@ class Core {
   }
 
   async managePlugins() {
+
+    try {
+      console.log('generation hooks enter')
+      this.Hookable.$registrationHooks(this.options.hooks);
+    } catch (error) {
+      console.log('generation hooks', error)
+      makeError('Unable to generate Hooks');
+      process.exit();
+    }
 
     try {
       console.log('generateAliases enter')
@@ -404,8 +416,7 @@ class Core {
     })
   }
   async $init() {
-    this.eventManager.emit('packify:init');
-
+    await this.Hookable.callHook('init');
     // let progressPck = new ProgressUi({
     //   format: 'CLI Progress |' + colors.green('{bar}') + '| {percentage}%'
     // })

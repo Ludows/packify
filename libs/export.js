@@ -45,7 +45,7 @@ class Exporter {
         );
       })
 
-      
+      await this.Compiler.Hookable.callHook('end', results);
       OutputTable.printTable();
 
     } catch (error) {
