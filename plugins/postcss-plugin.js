@@ -27,7 +27,7 @@ class PostCssPlugin extends PluginBase {
         
         var processor = postcss()
 
-        console.log('file content ?', file.content)
+        // console.log('file content ?', file.content)
 
         if(this.options.nano != false) {
             depsPostCss.push(
@@ -47,14 +47,12 @@ class PostCssPlugin extends PluginBase {
             );           
         }
 
-        console.log(depsPostCss)
+        // console.log(depsPostCss)
 
         try {
             depsPostCss.forEach((pluginPostCss) => { processor.use.bind(pluginPostCss) })
             res = await processor.process(file.content.toString());
-
-            console.log('response postcss?', res.css)
-
+            // console.log('response postcss?', res.css)
             return {
                 src: file.src,
                 name: getFileName(file.src),

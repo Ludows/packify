@@ -115,7 +115,7 @@ class JsExtractorPlugin extends PluginBase {
         let typedModule = typeOfModule(relativePath)
         // console.log('typedModule', typedModule)
 
-        let pathResolver =  moduleResolver(typedModule, {
+        let pathResolver =  await moduleResolverAsync(typedModule, {
             dirname: dirname,
             relativePath: relativePath
         })

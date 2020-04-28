@@ -5,7 +5,7 @@ const events = require('events');
 const eventEmitter = new events.EventEmitter();
 const PrettyError = require('pretty-error');
 const pe = new PrettyError();
-const resolve = require('resolve');
+const resolvePack = require('resolve');
 const util = require('util');
 
 
@@ -82,12 +82,12 @@ function moduleResolver(...args) {
     switch (args[0]) {
         case 'moduleName':
         case 'moduleAbsoluteResolution':
-            res = resolve.sync(args[1].relativePath, { basedir: getPath('node_modules') })
+            res = resolvePack.sync(args[1].relativePath, { basedir: getPath('node_modules') })
             // console.log('res', res)
             break;
         case 'dependencyAbsoluteResolution':
         case 'dependencyRelativeResolution':
-            res = resolve.sync(args[1].relativePath, { basedir: args[1].dirname })
+            res = resolvePack.sync(args[1].relativePath, { basedir: args[1].dirname })
             // console.log('res', res)
             break;
     
@@ -95,6 +95,35 @@ function moduleResolver(...args) {
             break;
     }
     return res;
+}
+
+function moduleResolverAsync(...args) {
+    // console.log('...args name', args[0])
+    // console.log('...args obj', args[1])
+    return new Promise((resolve, reject) => {
+        let baseDirecString = '';
+        switch (args[0]) {
+            case 'moduleName':
+            case 'moduleAbsoluteResolution':
+                baseDirecString = getPath('node_modules');
+                break;
+            case 'dependencyAbsoluteResolution':
+            case 'dependencyRelativeResolution':
+                baseDirecString = args[1].dirname;
+                // console.log('res', res)
+                break;
+        
+            default:
+                break;
+        }
+
+        resolvePack(args[1].relativePath, { basedir: baseDirecString }, (err, res) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(res);
+        })
+    })
 }
 
 function typeOfModule(string) {
@@ -283,6 +312,7 @@ function getExtendOption() {
 module.exports = {
     parseFileSync,
     moduleResolver,
+    moduleResolverAsync,
     haveSeparator,
     createReadStream,
     createWriteStream,
