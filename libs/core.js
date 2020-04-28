@@ -389,6 +389,8 @@ class Core {
     // console.log('after one')
 
     this.spinnies.succeed('fireTasks', { text: 'All tasks executed !' });
+    this.spinnies.remove('fireTasks')
+
 
     console.log('all tasks executed')
   
@@ -458,17 +460,8 @@ class Core {
       // process.exit();
     }
   }
-  async registerSpinnies() {
-    
-    this.spinnies.add('genAliases', { text: 'We Generate Aliases..' });
-    this.spinnies.add('genPlugins', { text: 'Check plugins..' });
-    this.spinnies.add('generateExecutionOrder', { text: 'Task generation..' });
-    this.spinnies.add('fireTasks', { text: 'Tasks begins' });
-    this.spinnies.add('export', { text: 'Export has just started' });  
-  }
   async start() {
     this.set('extensionsTriggered', []);
-    await this.registerSpinnies();
     await this.managePlugins();
     await this.$init();
     let Stats = await this.$runtimeExport();
