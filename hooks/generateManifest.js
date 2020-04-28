@@ -11,7 +11,7 @@ async function generateManifestFunction(...args) {
         formatPath,
         existFileSync
     } = require('@ludoows/packify/libs/helpers');
-    
+
     let results = args[0];
     let compiler = args[1];
 
@@ -20,8 +20,8 @@ async function generateManifestFunction(...args) {
     let outputPath = getPath(compiler.options.output.folder);
 
     results.forEach((result) => {
-
-        let strKey = result.compiled.replace(outputPath, '');
+        let strKey = "";
+        strKey += result.compiled.replace(outputPath, '');
 
         json[strKey] += strKey + '?id=' + result.hash;
 
