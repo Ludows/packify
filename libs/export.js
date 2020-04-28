@@ -27,7 +27,7 @@ class Exporter {
 
     let QueueKeys = Object.keys(this.Compiler.Queue);
 
-    console.log('Queue ? ', this.Compiler.Queue)
+    // console.log('Queue ? ', this.Compiler.Queue)
 
     let all_promesses = QueueKeys.map(async (file) => {
       return await this.$runFileProcess(this.Compiler.Queue[file]);
@@ -45,6 +45,10 @@ class Exporter {
       })
 
       await this.Compiler.Hookable.callHook('end', results);
+      console.log('after end hook')
+      await this.Compiler.Hookable.callHook('mdasset');
+      console.log('after mdasset hook')
+
       OutputTable.printTable();
 
     } catch (error) {

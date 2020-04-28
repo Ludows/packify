@@ -1,6 +1,9 @@
 const path = require('path');
 // console.log('path', path)
 
+const MDAsset = require('@ludoows/packify/hooks/mdAssets');
+const Manifest = require('@ludoows/packify/hooks/generateManifest');
+
 const BasePackifyConfig = {
     entry: '', // or []
     output: {
@@ -20,7 +23,10 @@ const BasePackifyConfig = {
         }],
         ['js-terser-plugin', {}]
     ],
-    hooks: {},
+    hooks: {
+        end: Manifest,
+        mdasset: MDAsset  
+    },
     alias: {
         '~': 'node_modules'
     },

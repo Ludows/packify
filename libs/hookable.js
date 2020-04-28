@@ -15,27 +15,14 @@ class PackifyHooks extends Hookable {
         let Keys = Object.keys(hooksToRegister);
 
         if(Keys.length > 0) {
-          let allPromises = Keys.map(async (key) => { return await registrationHooksHandler(key, hooksToRegister[key]); })
-
-          let res = await Promise.all( allPromises );
-          return res;
+          this.addHooks(hooksToRegister);
+          return hooksToRegister;
         }
         else {
-          return [];
+          return {};
         }
       }
-      async $registrationHooksHandler(hookName, handler) {
-        if(typeOf(handler) != 'function') {
-            makeError('handler must be a function. Handler received : '+typeOf(handler))
-            process.exit();
-        }
-        this.hook(hookName, async () => {
-            await handler()
-        })
-        this.hook(hookName, handler);
 
-        return hookName+' registered';
-      }
 }
 
 module.exports = PackifyHooks;

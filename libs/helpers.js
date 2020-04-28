@@ -61,9 +61,18 @@ function requireFile(...args) {
 }
 
 function makeError(...args) {
-    var renderedError = pe.render(new Error(...args));
+    let err;
+    if(args.length > 1) {
+        err = args.join(' --- ');
+    }
+    else {
+        err = args[0];
+    }
+
+    var renderedError = pe.render(new Error(err));
     pe.start();
-    // console.log(renderedError);
+    console.log(renderedError);
+    process.exit();
 }
 
 function moduleResolver(...args) {

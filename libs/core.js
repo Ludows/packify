@@ -102,7 +102,7 @@ class Core {
 
     } else {
       makeError('Packify not support at this moment, entries as objects. Please to use array of entries or string entry');
-      process.exit();
+      // process.exit();
     }
 
     const roadmapTasks = {};
@@ -114,7 +114,7 @@ class Core {
       if (!canBeProcessed) {
         console.log('entryString can not be processed', entryString)
         makeError('le type ' + fileType + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
-        process.exit();
+        // process.exit();
       }
 
       let registeredPluginsKeys = Object.keys(registeredPlugins);
@@ -177,7 +177,7 @@ class Core {
 
         if (ExtensionBindedByPlugin.length === 0) {
           makeError('Avez vous défini une liste des extensions que votre plugin ' + plugin[0] + ' peut transformer ?');
-          process.exit();
+          // process.exit();
         }
 
         let all = [...unique(extensions), ...unique(requiredPlugin.extensions())]
@@ -190,7 +190,7 @@ class Core {
 
       } else {
         makeError('Unable to resolve plugin : ' + plugin[0] + '');
-        process.exit();
+        // process.exit();
       }
 
       return plugin[0];
@@ -220,7 +220,7 @@ class Core {
     } catch (error) {
       console.log('generation hooks', error)
       makeError('Unable to generate Hooks');
-      process.exit();
+      // process.exit();
     }
 
     try {
@@ -229,7 +229,7 @@ class Core {
     } catch (error) {
       console.log('generateAliases error', error)
       makeError('Unable to generate Aliases');
-      process.exit();
+      // process.exit();
     }
 
     try {
@@ -238,7 +238,7 @@ class Core {
     } catch (error) {
       console.log('error registerPlugins', error)
       makeError('Error, for Registrations Plugins.')
-      process.exit()
+      // process.exit()
     }
 
     try {
@@ -246,8 +246,7 @@ class Core {
       await this.generateExecutionOrder();
     } catch (error) {
       console.log('error generateExecutionOrder', error)
-      makeError('Error, generateExecutionOrder fails.')
-      process.exit()
+      // makeError('Error, generateExecutionOrder fails.')
     }
 
   }
@@ -308,7 +307,6 @@ class Core {
       } catch (error) {
         // console.log(error)
         makeError('Unable to run task', error)
-        process.exit();
       }      
   }
   
@@ -324,6 +322,7 @@ class Core {
       return resultPromise
     } catch (error) {
       console.log('error error error error error', error)
+      makeError('Unable to get plugin response', error)
     }
   }
 
@@ -376,7 +375,6 @@ class Core {
     } catch (error) {
       console.log('exporter error', error)
       makeError('Export can not work.');
-      process.exit();
     }
 
     return stats;
@@ -427,7 +425,7 @@ class Core {
     } catch (error) {
       console.log('fireTasks error', error)
       makeError('Unable to fire tasks execution :(');
-      process.exit();
+      // process.exit();
     }
   }
   async start() {
