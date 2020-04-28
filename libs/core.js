@@ -14,9 +14,6 @@ const {
   mergeObjects,
 } = require('./helpers');
 
-const ProgressUi = require('@ludoows/packify/libs/progress');
-const colors = require('colors/safe');
-
 const Exporter = require('@ludoows/packify/libs/export');
 
 const MyHookable = require('@ludoows/packify/libs/hookable');
@@ -308,21 +305,6 @@ class Core {
     // console.log('ret', ret)
     return ret;
   }
-  $startProgress(maxInt) {
-    this.options.Progress.start(maxInt, 0, {
-      speed: "N/A"
-    });
-    return this;
-  }
-  $updateProgress(integer) {
-    this.options.Progress.update(integer);
-    return this;
-  }
-  $stopProgress() {
-    this.options.Progress.stop();
-    return this;
-  }
-
   async $getResponsePlugin(file) {
     // console.log('list')
     let plugins = this.get('registeredPlugins');
@@ -459,18 +441,9 @@ class Core {
   }
   async $init() {
     await this.Hookable.callHook('init');
-    // let progressPck = new ProgressUi({
-    //   format: 'CLI Progress |' + colors.green('{bar}') + '| {percentage}%'
-    // })
-
-    // let progress = progressPck.make();
-
-    // this.set('Progress', progress);
-
-    // console.log('Progress', this.options.Progress)
 
     try {
-      console.log('fireTasks enter')
+      // console.log('fireTasks enter')
       await this.$fireTasks();
     } catch (error) {
       // console.log('fireTasks error', error)

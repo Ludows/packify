@@ -19,12 +19,9 @@
     "resolve": "^1.15.1",
     "cross-env": "^7.0.2",
     "pretty-error": "^2.1.1",
-    "cli-progress": "^3.7.0",
-    "colors": "^1.4.0",
     "node-sass": "^4.13.1",
     "node-sass-alias-importer": "^1.0.0",
     "merge": "^1.2.1",
-    "console-table-printer": "^1.4.1",
     "postcss": "^2.0.3",
     "autoprefixer": "^9.7.6",
     "cssnano": "^4.1.10",
@@ -32,6 +29,7 @@
     "chokidar": "^3.3.1",
     "hookable": "^4.1.0",
     "terser": "^4.6.12",
-    "spinnies": "^0.5.1"
+    "spinnies": "^0.5.1",
+    "tty-table": "^4.1.1"
   }
 }

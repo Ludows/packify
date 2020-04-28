@@ -14,7 +14,7 @@ const {
 const path = require('path');
 const fs = require('fs');
 
-const { Table } = require('console-table-printer');
+const Table = require('tty-table')
 
 class Exporter {
   constructor(...args) {
@@ -36,12 +36,50 @@ class Exporter {
     try {
       
       var results = await Promise.all( all_promesses );
+
+      let header = [];
+      let headers_table = [
+        "Source File",
+        "Output file",
+        "Hash"
+      ]
+
+      for (let index = 0; index < headers_table.length; index++) {
+        const type = headers_table[index];
+
+        if(type.toLowerCase() === "hash" && !this.Compiler.options.output.hash) {
+          break;
+        }
+        header.push({
+          value: type,
+          headerColor: "green",
+          color: "white",
+          align: "left",
+          width: this.Compiler.options.output.hash ? 33 : 50
+        })
+
+      }
+
+      const options = {
+        headerAlign: "center",
+        align: "left",
+        color: "white",
+        truncate: "mixed",
+        width: "100%",
+        compact: true
+      }
+
+      let rows = []
       
       results.forEach((result) => {
-        OutputTable.addRow(
-          result,
-          { color: 'green' }
-        );
+        let line_row = [];
+        let keysResult = Object.keys(result);
+        
+        keysResult.forEach((key) => {
+          line_row.push(result[key]);
+        })
+        
+        rows.push(line_row);
       })
 
       await this.Compiler.Hookable.callHook('end', results, this.Compiler);
@@ -52,8 +90,8 @@ class Exporter {
 
       this.Compiler.spinnies.remove('export')
       
-
-      OutputTable.printTable();
+      const out = Table(header,rows,options).render();
+      console.log(out)
 
     } catch (error) {
       console.log('error', error)
@@ -66,12 +104,12 @@ class Exporter {
     // console.log('element ?', element)
 
     let urlDest = await this.getUrlDest(element, this.Compiler.options.output);
-    let objectReturn = { source: element.src , dest: urlDest }
+    let objectReturn = { source : element.src , compiled : urlDest }
     await this.createStreamableProcess(element, urlDest)
 
     if(this.Compiler.options.output.hash) {
       let theHash = await this.createHash(element.name);
-      objectReturn = { source: element.src , compiled: urlDest, hash:theHash }
+      objectReturn = { source : element.src , compiled : urlDest, hash : theHash }
     }
 
     return objectReturn
