@@ -1,6 +1,6 @@
 const Hookable = require('hookable/dist/hookable');
 
-console.log('Hookable', Hookable)
+// console.log('Hookable', Hookable)
 
 const { makeError, typeOf } = require('@ludoows/packify/libs/helpers')
 

@@ -1,8 +1,8 @@
 const fs = require('fs');
 
 async function MdAssetFunction(...args) {
-    console.log('MdAssetFunction')
-    console.log('MdAssetFunction ...args', ...args[0])
+    // console.log('MdAssetFunction')
+    // console.log('MdAssetFunction ...args', ...args[0])
 
     const {
         getPath,

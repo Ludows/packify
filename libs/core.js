@@ -42,7 +42,6 @@ class Core {
 
     if (!file) {
       makeError('need file to process to queue management')
-      process.exit();
     }
 
     if(file.content) {
@@ -121,7 +120,7 @@ class Core {
       let fileType = getFileType(entryString);
 
       if (!canBeProcessed) {
-        console.log('entryString can not be processed', entryString)
+        // console.log('entryString can not be processed', entryString)
         makeError('le type ' + fileType + ' ne peut pas être transformé. Aucuns plugins ne supportent ce type de fichier.')
         // process.exit();
       }
@@ -209,7 +208,8 @@ class Core {
       let resultPromises = await Promise.all( plugins_promises )
       // console.log('resultPromises', resultPromises)
     } catch (error) {
-      console.log('error error error error', error)
+      console.log('error error error error', error);
+      makeError(error)
     }
 
     // console.log('pluginsInitialized', pluginsInitialized)
@@ -224,7 +224,7 @@ class Core {
   async managePlugins() {
 
     try {
-      console.log('generation hooks enter')
+      // console.log('generation hooks enter')
       this.spinnies.add('genHooks', { text: 'We Generate hooks..' });
       
       await this.Hookable.$registrationHooks(this.options.hooks);
@@ -232,44 +232,44 @@ class Core {
       this.spinnies.succeed('genHooks', { text: 'hooks Generated!' });
       this.spinnies.remove('genHooks')
     } catch (error) {
-      console.log('generation hooks', error)
+      // console.log('generation hooks', error)
       makeError('Unable to generate Hooks');
       // process.exit();
     }
 
     try {
-      console.log('generateAliases enter')
+      // console.log('generateAliases enter')
       this.spinnies.add('genAliases', { text: 'We Generate Aliases..' });
       await this.$generateAliases();
       this.spinnies.succeed('genAliases', { text: 'Aliases Generated!' });
       this.spinnies.remove('genAliases')
     } catch (error) {
-      console.log('generateAliases error', error)
+      // console.log('generateAliases error', error)
       makeError('Unable to generate Aliases');
       // process.exit();
     }
 
     try {
-      console.log('enter registerPlugins')
+      // console.log('enter registerPlugins')
       this.spinnies.add('genPlugins', { text: 'Plugins Initialization..' });
       await this.registerPlugins();
       this.spinnies.succeed('genPlugins', { text: 'Plugins Initialized!' });
       this.spinnies.remove('genPlugins')
     } catch (error) {
-      console.log('error registerPlugins', error)
+      // console.log('error registerPlugins', error)
       makeError('Error, for Registrations Plugins.')
       // process.exit()
     }
 
     try {
-      console.log('enter generateExecutionOrder')
+      // console.log('enter generateExecutionOrder')
       this.spinnies.add('generateExecutionOrder', { text: 'generateExecutionOrder Initialization..' });
       await this.generateExecutionOrder();
       this.spinnies.succeed('generateExecutionOrder', { text: 'generateExecutionOrder Ready!' });
       this.spinnies.remove('generateExecutionOrder')
     } catch (error) {
-      console.log('error generateExecutionOrder', error)
-      // makeError('Error, generateExecutionOrder fails.')
+      // console.log('error generateExecutionOrder', error)
+      makeError('Error, generateExecutionOrder fails.', error)
     }
 
   }
@@ -344,7 +344,7 @@ class Core {
       let resultPromise = await Promise.all( tableau_promesses );
       return resultPromise
     } catch (error) {
-      console.log('error error error error error', error)
+      // console.log('error error error error error', error)
       makeError('Unable to get plugin response', error)
     }
   }
@@ -376,7 +376,8 @@ class Core {
         let responses = await self.$getDatasPlugin(fileList)
         // console.log('responses', responses)
       } catch (error) {
-        console.log('error', error)
+        // console.log('error', error)
+        makeError(error);
       }
       
       if(indexStart < roadmapKeys.length - 1) {
@@ -392,11 +393,11 @@ class Core {
     this.spinnies.remove('fireTasks')
 
 
-    console.log('all tasks executed')
+    // console.log('all tasks executed')
   
   }
   async $runtimeExport() {    
-    console.log('export started');
+    // console.log('export started');
     this.spinnies.add('export', { text: 'Export has just started..' });
 
     let Export = new Exporter(this);
@@ -404,7 +405,7 @@ class Core {
     try {
       let stats = await Export.run();
     } catch (error) {
-      console.log('exporter error', error)
+      // console.log('exporter error', error)
       makeError('Export can not work.');
     }
 
@@ -455,7 +456,7 @@ class Core {
       console.log('fireTasks enter')
       await this.$fireTasks();
     } catch (error) {
-      console.log('fireTasks error', error)
+      // console.log('fireTasks error', error)
       makeError('Unable to fire tasks execution :(');
       // process.exit();
     }
