@@ -21,6 +21,14 @@ const Exporter = require('@ludoows/packify/libs/export');
 
 const MyHookable = require('@ludoows/packify/libs/hookable');
 
+const Spinnies = require('spinnies');
+
+const default_spinner = { 
+  color: 'blue', 
+  succeedColor: 'green', 
+  spinner: { interval: 80, frames: ['🍇', '🍈', '🍉', '🍋'] }
+};
+
 
 
 class Core {
@@ -28,6 +36,7 @@ class Core {
     this.options = opts;
     this.Queue = {};
     this.Hookable = new MyHookable();
+    this.spinnies = new Spinnies(default_spinner);
   }
   queue(file) {
 
@@ -428,8 +437,17 @@ class Core {
       // process.exit();
     }
   }
+  async registerSpinnies() {
+    this.spinnies.add('genHooks', { text: 'We Generate hooks..' });
+    this.spinnies.add('genAliases', { text: 'We Generate Aliases..' });
+    this.spinnies.add('genPlugins', { text: 'Check plugins..' });
+    this.spinnies.add('generateExecutionOrder', { text: 'Task generation..' });
+    this.spinnies.add('fireTasks', { text: 'Tasks begins' });
+    this.spinnies.add('export', { text: 'Export has just started' });  
+  }
   async start() {
     this.set('extensionsTriggered', []);
+    await this.registerSpinnies();
     await this.managePlugins();
     await this.$init();
     let Stats = await this.$runtimeExport();

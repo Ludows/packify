@@ -31,6 +31,7 @@
     "postcss-initial": "^3.0.2",
     "chokidar": "^3.3.1",
     "hookable": "^4.1.0",
-    "terser": "^4.6.12"
+    "terser": "^4.6.12",
+    "spinnies": "^0.5.1"
   }
 }

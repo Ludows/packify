@@ -23,7 +23,7 @@ async function generateManifestFunction(...args) {
         let strKey = "";
         strKey += result.compiled.replace(outputPath, '');
 
-        json[strKey] += strKey + '?id=' + result.hash;
+        json[strKey] = strKey + '?id=' + result.hash;
 
     })
 
