@@ -1,14 +1,17 @@
-const {
-    getPath,
-    formatPath,
-    existFileSync
-} = require('@ludoows/packify/libs/helpers');
+
 
 const fs = require('fs');
 
 async function generateManifestFunction(...args) {
     // console.log('generateManifestFunction')
     // console.log('generateManifestFunction ...args', ...args[0])
+
+    const {
+        getPath,
+        formatPath,
+        existFileSync
+    } = require('@ludoows/packify/libs/helpers');
+    
     let results = args[0];
     let compiler = args[1];
 

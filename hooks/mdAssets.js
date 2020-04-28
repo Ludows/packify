@@ -1,20 +1,18 @@
-
-
-const {
-    getPath,
-    existFileSync,
-    parseFile,
-    getFileType,
-    getFileName
-} = require('@ludoows/packify/libs/helpers');
-
 const fs = require('fs');
 
 async function MdAssetFunction(...args) {
     console.log('MdAssetFunction')
     console.log('MdAssetFunction ...args', ...args[0])
 
-    let results = args[0];
+    const {
+        getPath,
+        existFileSync,
+        parseFile,
+        getFileType,
+        getFileName
+    } = require('@ludoows/packify/libs/helpers');
+
+    // let results = args[0];
     let compiler = args[1];
 
     // console.log('prout')
@@ -60,7 +58,7 @@ async function MdAssetFunction(...args) {
         }
     })
 
-    let destPathMDAsset = getPath('public', 'mdassets-autoload.json');
+    let destPathMDAsset = getPath(compiler.options.output.folder , 'mdassets-autoload.json');
 
     if(existFileSync(destPathMDAsset)) {
         // on retire le fichier
