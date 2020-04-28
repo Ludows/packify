@@ -30,6 +30,7 @@ const BasePackifyConfig = {
     alias: {
         '~': 'node_modules'
     },
+    cache: false,
     resolvers: {
         plugins: []
     }

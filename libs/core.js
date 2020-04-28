@@ -203,7 +203,7 @@ class Core {
       console.log('error error error error', error)
     }
 
-    console.log('pluginsInitialized', pluginsInitialized)
+    // console.log('pluginsInitialized', pluginsInitialized)
     var pluginsInitializedKeys = Object.keys(pluginsInitialized);
     if (pluginsInitializedKeys.length > 0) {
       this.set('registeredPlugins', pluginsInitialized);
@@ -330,7 +330,7 @@ class Core {
     let roadmap = this.get('roadmapTasks');
     let plugins = this.get('registeredPlugins');
 
-    console.log('roadmap', roadmap)
+    // console.log('roadmap', roadmap)
 
     var self = this;
 
@@ -355,7 +355,7 @@ class Core {
       }
       
       if(indexStart < roadmapKeys.length - 1) {
-        console.log('continue other tasks');
+        // console.log('continue other tasks');
         indexStart++;
         await loadAllTransformations(indexStart);
       }

@@ -29,7 +29,7 @@ class SassPlugin extends PluginBase {
     async run(file) {
 
         return new Promise((resolve,reject) => {
-            console.log('started sass', file)
+            // console.log('started sass', file)
             let the_file = { 'file' : file.src }
             let options = mergeObjects(this.options, the_file);
             // console.log('options', options)
