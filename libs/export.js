@@ -23,7 +23,6 @@ class Exporter {
   }
   async run() {
 
-    let OutputTable = new Table();
 
     let QueueKeys = Object.keys(this.Compiler.Queue);
 
@@ -55,18 +54,18 @@ class Exporter {
           headerColor: "green",
           color: "white",
           align: "left",
-          width: this.Compiler.options.output.hash ? 33 : 50
+          width: this.Compiler.options.output.hash ? "33%" : "50%"
         })
 
       }
 
       const options = {
-        headerAlign: "center",
+        headerAlign: "left",
         align: "left",
         color: "white",
-        truncate: "mixed",
+        truncate: false,
         width: "100%",
-        compact: true
+        compact: false
       }
 
       let rows = []
@@ -89,6 +88,10 @@ class Exporter {
       this.Compiler.spinnies.succeed('export', { text: 'Export success !' });
 
       this.Compiler.spinnies.remove('export')
+
+      // console.log('header', header)
+      // console.log('rows', rows)
+      // console.log('options', options)
       
       const out = Table(header,rows,options).render();
       console.log(out)
