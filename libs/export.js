@@ -52,8 +52,6 @@ class Exporter {
         header.push({
           value: type,
           headerColor: "green",
-          color: "white",
-          align: "left",
           width: this.Compiler.options.output.hash ? "33%" : "50%"
         })
 
@@ -62,10 +60,11 @@ class Exporter {
       const options = {
         headerAlign: "left",
         align: "left",
-        color: "white",
+        color: "green",
         truncate: false,
         width: "100%",
-        compact: false
+        compact: false,
+        borderColor: 'green'
       }
 
       let rows = []
