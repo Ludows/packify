@@ -26,7 +26,24 @@ const Spinnies = require('spinnies');
 const default_spinner = { 
   color: 'blue', 
   succeedColor: 'green', 
-  spinner: { interval: 80, frames: ['🍇', '🍈', '🍉', '🍋'] }
+  spinner: { "interval": 80,
+  frames: [
+    "[    ]",
+    "[=   ]",
+    "[==  ]",
+    "[=== ]",
+    "[ ===]",
+    "[  ==]",
+    "[   =]",
+    "[    ]",
+    "[   =]",
+    "[  ==]",
+    "[ ===]",
+    "[====]",
+    "[=== ]",
+    "[==  ]",
+    "[=   ]"
+  ] }
 };
 
 
