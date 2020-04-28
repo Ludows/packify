@@ -198,7 +198,7 @@ class Core {
 
     try {
       let resultPromises = await Promise.all( plugins_promises )
-      console.log('resultPromises', resultPromises)
+      // console.log('resultPromises', resultPromises)
     } catch (error) {
       console.log('error error error error', error)
     }
@@ -315,9 +315,9 @@ class Core {
   async $getDatasPlugin(fileList) {
     let tableau_promesses = fileList.map(async (file) => { return await this.$getResponsePlugin(file) });
 
-    console.log('tableau_promesses ?', tableau_promesses)
+    // console.log('tableau_promesses ?', tableau_promesses)
 
-    console.log('before promises return')
+    // console.log('before promises return')
 
     try {
       let resultPromise = await Promise.all( tableau_promesses );
@@ -331,7 +331,7 @@ class Core {
     let roadmap = this.get('roadmapTasks');
     let plugins = this.get('registeredPlugins');
 
-    // console.log('roadmap', roadmap)
+    console.log('roadmap', roadmap)
 
     var self = this;
 
@@ -346,27 +346,23 @@ class Core {
       const fileList = roadmap[pluginName];
       // console.log('fileList', fileList)
       self.set('pluginName', pluginName)
-      console.log('before await', )
+      // console.log('before await', )
       
       try {
         let responses = await self.$getDatasPlugin(fileList)
-        console.log('responses', responses)
+        // console.log('responses', responses)
       } catch (error) {
         console.log('error', error)
       }
       
-      console.log('after await')
-      
-      
+      if(indexStart < roadmapKeys.length - 1) {
+        console.log('continue other tasks');
+        indexStart++;
+        await loadAllTransformations(indexStart);
+      }
     }
     await loadAllTransformations(indexStart);
-    console.log('after one')
-
-    if(indexStart <= roadmapKeys.length - 1) {
-      console.log('continue other tasks');
-      indexStart++;
-      await loadAllTransformations(indexStart);
-    }
+    // console.log('after one')
 
     console.log('all tasks executed')
   
@@ -374,7 +370,7 @@ class Core {
   async $runtimeExport() {    
     console.log('export started');
     let Export = new Exporter(this);
-    console.log('after instance export');
+    // console.log('after instance export');
     try {
       let stats = await Export.run();
     } catch (error) {

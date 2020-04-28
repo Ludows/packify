@@ -19,11 +19,15 @@ class PostCssPlugin extends PluginBase {
         }
     }
     extensions() {
-        return ['css']
+        return ['sass', 'scss', 'css']
     }
     async run(file) {
         var res = undefined;
         var depsPostCss = [];
+        
+        var processor = postcss()
+
+        console.log('file content ?', file.content)
 
         if(this.options.nano != false) {
             depsPostCss.push(
@@ -43,14 +47,28 @@ class PostCssPlugin extends PluginBase {
             );           
         }
 
-        res = await postcss( depsPostCss ).process(file.content.toString());
+        console.log(depsPostCss)
 
-        return {
-            src: file.src,
-            name: getFileName(file.src),
-            extension: getFileType(file.src),
-            content: res.css      
+        try {
+            depsPostCss.forEach((pluginPostCss) => { processor.use.bind(pluginPostCss) })
+            res = await processor.process(file.content.toString());
+
+            console.log('response postcss?', res.css)
+
+            return {
+                src: file.src,
+                name: getFileName(file.src),
+                extension: getFileType(file.src),
+                content: res.css      
+            }
+        } catch (error) {
+            makeError(error);
+            console.log('error', error);
+            process.exit();
         }
+        
+
+        
 
     }
 }

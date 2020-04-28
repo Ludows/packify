@@ -14,7 +14,9 @@ const BasePackifyConfig = {
         }],
         ['sass-plugin', {}],
         ['postcss-plugin', {
-            flexbox: "no-2009"
+            autoprefixer: {
+                flexbox: "no-2009"
+            }
         }],
         ['js-terser-plugin', {}]
     ],

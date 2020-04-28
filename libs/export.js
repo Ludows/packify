@@ -1,9 +1,6 @@
 const crypto = require('crypto');
 
 const translator = require('@ludoows/packify/libs/translator');
-const prettier = require("prettier");
-
-
 
 const {
   getFileType,
@@ -30,8 +27,10 @@ class Exporter {
 
     let QueueKeys = Object.keys(this.Compiler.Queue);
 
+    console.log('Queue ? ', this.Compiler.Queue)
+
     let all_promesses = QueueKeys.map(async (file) => {
-      return await this.$runFileProcess(file);
+      return await this.$runFileProcess(this.Compiler.Queue[file]);
     });
 
     try {
@@ -55,13 +54,16 @@ class Exporter {
     
   }
   async $runFileProcess(element) {
+
+    // console.log('element ?', element)
+
     let urlDest = await this.getUrlDest(element, this.Compiler.options.output);
-    let objectReturn = { source: file , dest: urlDest }
+    let objectReturn = { source: element.src , dest: urlDest }
     await this.createStreamableProcess(element, urlDest)
 
     if(this.Compiler.options.output.hash) {
-      let theHash = await this.createHash(element);
-      objectReturn = { source: file , compiled: urlDest, hash:theHash }
+      let theHash = await this.createHash(element.name);
+      objectReturn = { source: element.src , compiled: urlDest, hash:theHash }
     }
 
     return objectReturn
@@ -77,13 +79,11 @@ class Exporter {
         })
       }
 
-      var prettyCode = prettier.format(file.content.toString(), { semi: true, parser: "babel" });
-
       if (fs.existsSync(urlDest) == false) {
-        fs.writeFileSync(urlDest, prettyCode)
+        fs.writeFileSync(urlDest, file.content.toString())
       } else {
         fs.writeFileSync(urlDest, '')
-        fs.writeFileSync(urlDest, prettyCode)
+        fs.writeFileSync(urlDest, file.content.toString())
       }
   }
   async getUrlDest(file, optionsOutput) {
