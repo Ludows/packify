@@ -44,9 +44,9 @@ class Exporter {
         );
       })
 
-      await this.Compiler.Hookable.callHook('end', results);
+      await this.Compiler.Hookable.callHook('end', results, this.Compiler);
       console.log('after end hook')
-      await this.Compiler.Hookable.callHook('mdasset', results);
+      await this.Compiler.Hookable.callHook('mdasset', results, this.Compiler);
       console.log('after mdasset hook')
 
       OutputTable.printTable();

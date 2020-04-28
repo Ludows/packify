@@ -44,12 +44,12 @@ async function parseFile(...args) {
     
     try {
         bufferFile = await fs.promises.readFile(args[0])
+        return JSON.parse(bufferFile);
     } catch (error) {
         makeError(' Le fichier suivant ne peut pas être parsé. '+ args[0] +' ');
-        process.exit();
     }
     
-    return JSON.parse(bufferFile);
+    
 }
 
 function parseFileSync(...args) {
