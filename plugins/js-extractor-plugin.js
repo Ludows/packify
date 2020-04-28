@@ -6,7 +6,7 @@ const {
     getFileType,
     getListingDir,
     typeOfModule,
-    moduleResolver
+    moduleResolverAsync
 } = require('@ludoows/packify/libs/helpers')
 
 const parser = require("babylon"); // parses and returns AST
