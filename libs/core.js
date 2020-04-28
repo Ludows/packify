@@ -225,7 +225,12 @@ class Core {
 
     try {
       console.log('generation hooks enter')
-      this.Hookable.$registrationHooks(this.options.hooks);
+      this.spinnies.add('genHooks', { text: 'We Generate hooks..' });
+      
+      await this.Hookable.$registrationHooks(this.options.hooks);
+      
+      this.spinnies.succeed('genHooks', { text: 'hooks Generated!' });
+      this.spinnies.remove('genHooks')
     } catch (error) {
       console.log('generation hooks', error)
       makeError('Unable to generate Hooks');
@@ -234,7 +239,10 @@ class Core {
 
     try {
       console.log('generateAliases enter')
+      this.spinnies.add('genAliases', { text: 'We Generate Aliases..' });
       await this.$generateAliases();
+      this.spinnies.succeed('genAliases', { text: 'Aliases Generated!' });
+      this.spinnies.remove('genAliases')
     } catch (error) {
       console.log('generateAliases error', error)
       makeError('Unable to generate Aliases');
@@ -243,7 +251,10 @@ class Core {
 
     try {
       console.log('enter registerPlugins')
+      this.spinnies.add('genPlugins', { text: 'Plugins Initialization..' });
       await this.registerPlugins();
+      this.spinnies.succeed('genPlugins', { text: 'Plugins Initialized!' });
+      this.spinnies.remove('genPlugins')
     } catch (error) {
       console.log('error registerPlugins', error)
       makeError('Error, for Registrations Plugins.')
@@ -252,7 +263,10 @@ class Core {
 
     try {
       console.log('enter generateExecutionOrder')
+      this.spinnies.add('generateExecutionOrder', { text: 'generateExecutionOrder Initialization..' });
       await this.generateExecutionOrder();
+      this.spinnies.succeed('generateExecutionOrder', { text: 'generateExecutionOrder Ready!' });
+      this.spinnies.remove('generateExecutionOrder')
     } catch (error) {
       console.log('error generateExecutionOrder', error)
       // makeError('Error, generateExecutionOrder fails.')
@@ -336,6 +350,8 @@ class Core {
   }
 
   async $fireTasks() {
+    this.spinnies.add('fireTasks', { text: 'Tasks has just started..' });
+
     let roadmap = this.get('roadmapTasks');
     let plugins = this.get('registeredPlugins');
 
@@ -372,11 +388,15 @@ class Core {
     await loadAllTransformations(indexStart);
     // console.log('after one')
 
+    this.spinnies.succeed('fireTasks', { text: 'All tasks executed !' });
+
     console.log('all tasks executed')
   
   }
   async $runtimeExport() {    
     console.log('export started');
+    this.spinnies.add('export', { text: 'Export has just started..' });
+
     let Export = new Exporter(this);
     // console.log('after instance export');
     try {
@@ -386,6 +406,7 @@ class Core {
       makeError('Export can not work.');
     }
 
+    
     return stats;
   }
   async $generateAliases() {
@@ -438,7 +459,7 @@ class Core {
     }
   }
   async registerSpinnies() {
-    this.spinnies.add('genHooks', { text: 'We Generate hooks..' });
+    
     this.spinnies.add('genAliases', { text: 'We Generate Aliases..' });
     this.spinnies.add('genPlugins', { text: 'Check plugins..' });
     this.spinnies.add('generateExecutionOrder', { text: 'Task generation..' });

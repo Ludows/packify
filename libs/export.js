@@ -48,6 +48,10 @@ class Exporter {
       console.log('after end hook')
       await this.Compiler.Hookable.callHook('mdasset', results, this.Compiler);
       console.log('after mdasset hook')
+      this.Compiler.spinnies.succeed('export', { text: 'Export success !' });
+
+      this.Compiler.spinnies.remove('export')
+      
 
       OutputTable.printTable();
 
