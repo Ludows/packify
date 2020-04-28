@@ -51,6 +51,7 @@ class Core {
     this.Queue = {};
     this.Hookable = new MyHookable();
     this.spinnies = new Spinnies(default_spinner);
+    this.Start = Date.now();
   }
   queue(file) {
 

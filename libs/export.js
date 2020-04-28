@@ -91,8 +91,10 @@ class Exporter {
       // console.log('header', header)
       // console.log('rows', rows)
       // console.log('options', options)
-      
+      var end = Date.now();
       const out = Table(header,rows,options).render();
+
+      console.log('Process executed in '+ ( end - this.Compiler.Start ) +' ms')
       console.log(out)
 
     } catch (error) {
