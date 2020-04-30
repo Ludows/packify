@@ -22,7 +22,7 @@ class JsExtractorPlugin extends PluginBase {
     getDefaults() {
         return {
             presets: ['env'],
-            sourceMaps: process.env.NODE_ENV === 'development' ? "both" : false
+            sourceMaps: false
         }
     }
     extensions() {

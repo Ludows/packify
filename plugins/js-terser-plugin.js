@@ -18,6 +18,8 @@ class TerserPlugin extends PluginBase {
             compress: process.env.NODE_ENV === 'development' ? false : {},
             mangle: process.env.NODE_ENV === 'development' ? false : {},
             output: {
+                beautify: process.env.NODE_ENV === 'development' ? true : false,
+                preamble: process.env.NODE_ENV === 'development' ? "/* minified */" : "",
                 ast: false,
                 code: true  // optional - faster if false
             }
