@@ -15,7 +15,8 @@ class PostCssPlugin extends PluginBase {
         return {
             nano: false,
             autoprefixer: false,
-            initial: false
+            initial: false,
+            purify: false
         }
     }
     extensions() {
@@ -47,17 +48,37 @@ class PostCssPlugin extends PluginBase {
             );           
         }
 
+        if(this.options.purify != false) {
+            depsPostCss.push(
+                require('postcss-purifycss')(this.options.purify)
+            );           
+        }
+
         // console.log(depsPostCss)
 
         try {
             depsPostCss.forEach((pluginPostCss) => { processor.use.bind(pluginPostCss) })
-            res = await processor.process(file.content.toString());
+
+            let fileName = getFileName(file.src);
+            let ext = getFileType(file.src);
+
+            let final_name = fileName.replace(ext, 'css');
+
+            res = await processor.process(file.content.toString(), { 
+                from: file.src,
+                to:   final_name,
+                map: {
+                    prev: file.map.toString(), 
+                    inline: false 
+                } 
+            });
             // console.log('response postcss?', res.css)
             return {
                 src: file.src,
                 name: getFileName(file.src),
                 extension: getFileType(file.src),
-                content: res.css      
+                content: res.css,
+                map: res.map.toString()    
             }
         } catch (error) {
             makeError(error);

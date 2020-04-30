@@ -63,11 +63,19 @@ class Core {
       file.content = Buffer.from(file.content,'utf-8');
     }
 
+    if(file.map) {
+      file.map = Buffer.from(file.map,'utf-8');
+    }
+
     if (this.isInQueue(file) === false) {
       this.Queue[file.src] = file
     } else {
       // Todo cas de l'update
       this.Queue[file.src].content = file.content;
+
+      if(this.Queue[file.src].map && file.map) {
+        this.Queue[file.src].map = file.map;
+      }
     }
 
   }

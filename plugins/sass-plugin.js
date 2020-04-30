@@ -16,7 +16,7 @@ class SassPlugin extends PluginBase {
     getDefaults() {
         return {
             outputStyle: process.env.NODE_ENV === 'development' ? 'nested' : 'compact',
-            sourceMapEmbed: process.env.NODE_ENV === 'development' ? true : false,
+            sourceMapEmbed: false,
             sourceMap: process.env.NODE_ENV === 'development' ? true : false,
             importer: [
                 aliasImporter(this.compiler.options.alias)
@@ -30,7 +30,7 @@ class SassPlugin extends PluginBase {
 
         return new Promise((resolve,reject) => {
             // console.log('started sass', file)
-            let the_file = { 'file' : file.src }
+            let the_file = { 'file' : file.src, 'outFile':  getFileName(file.src) }
             let options = mergeObjects(this.options, the_file);
             // console.log('options', options)
                 sass.render(options, function(err, result) {
