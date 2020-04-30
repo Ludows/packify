@@ -14,9 +14,9 @@ class TerserPlugin extends PluginBase {
     }
     getDefaults() {
         return {
-            parse: {},
-            compress: {},
-            mangle: {},
+            parse: process.env.NODE_ENV === 'development' ? false : {},
+            compress: process.env.NODE_ENV === 'development' ? false : {},
+            mangle: process.env.NODE_ENV === 'development' ? false : {},
             output: {
                 ast: false,
                 code: true  // optional - faster if false
@@ -29,6 +29,7 @@ class TerserPlugin extends PluginBase {
     async run(file) {
         
         var result = Terser.minify(file.content.toString(), this.options);
+        if (result.error) makeError('Terser error says', result.error);
 
         return {
             src: file.src,
