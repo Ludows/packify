@@ -17,7 +17,7 @@ class JsExtractorPlugin extends PluginBase {
     constructor(...args) {
         super(args[0], args[1], args[2])
         this.ID = 0;
-        this.sourceToFile = '';
+        this.sourceToFile = null;
         // this.deps = getListingDependenciesProject()
     }
     getDefaults() {
@@ -88,7 +88,7 @@ class JsExtractorPlugin extends PluginBase {
 
         // console.log('map', map)
 
-        this.sourceToFile = map;
+        this.sourceToFile = JSON.stringify(map);
 
         return {
             id,

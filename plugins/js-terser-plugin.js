@@ -32,7 +32,7 @@ class TerserPlugin extends PluginBase {
         
         let source_maps_opts = { 
             sourceMap: {
-                content: file.map,
+                content: JSON.parse(file.map.toString()),
                 filename: getFileName(file.src),
                 url: getFileName(file.src)+".map"
             }
