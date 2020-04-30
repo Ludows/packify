@@ -135,6 +135,16 @@ class Exporter {
         fs.writeFileSync(urlDest, '')
         fs.writeFileSync(urlDest, file.content.toString())
       }
+
+      let urlDestMap = urlDest+".map";
+      if (fs.existsSync(urlDestMap) == false) {
+        fs.writeFileSync(urlDestMap, file.map.toString())
+      } else {
+        fs.writeFileSync(urlDestMap, '')
+        fs.writeFileSync(urlDestMap, file.map.toString())
+      }
+
+  
   }
   async getUrlDest(file, optionsOutput) {
     let skippingPartsUrl = optionsOutput.pathsFragmentSkipping

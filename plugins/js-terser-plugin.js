@@ -30,7 +30,18 @@ class TerserPlugin extends PluginBase {
     }
     async run(file) {
         
-        var result = Terser.minify(file.content.toString(), this.options);
+        let source_maps_opts = { 
+            sourceMap: {
+                content: file.map;
+                filename: getFileName(file.src),
+                url: getFileName(file.src)+".map"
+            }
+        }
+        let options = mergeObjects(this.options, source_maps_opts);
+
+        // console.log('options terser', options)
+        
+        var result = Terser.minify(file.content.toString(), options);
         if (result.error) makeError('Terser error says', result.error);
 
         return {
@@ -38,6 +49,7 @@ class TerserPlugin extends PluginBase {
             name: getFileName(file.src),
             extension: getFileType(file.src),
             content: result.code,
+            map: result.map
         }
     }
 }

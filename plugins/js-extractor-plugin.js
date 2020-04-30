@@ -17,12 +17,13 @@ class JsExtractorPlugin extends PluginBase {
     constructor(...args) {
         super(args[0], args[1], args[2])
         this.ID = 0;
+        this.sourceToFile = '';
         // this.deps = getListingDependenciesProject()
     }
     getDefaults() {
         return {
             presets: ['env'],
-            sourceMaps: false
+            sourceMaps: process.env.NODE_ENV === 'development' ? true : false
         }
     }
     extensions() {
@@ -48,7 +49,8 @@ class JsExtractorPlugin extends PluginBase {
                 name: getFileName(file.src),
                 extension: getFileType(file.src),
                 content: bundle,
-                graph: graph
+                graph: graph,
+                map: this.sourceToFile
             }
 
             // compiler.$updateProgress(entryCounter);
@@ -74,14 +76,19 @@ class JsExtractorPlugin extends PluginBase {
             }
         });
         const id = this.ID++;
+        
+        if(this.options.sourceMaps == true) {
+            this.options.sourceFileName = filename;
+        }
+
         const {
-            code
+            code,
+            map
         } = await babel.transformFromAstAsync(ast, null, this.options);
 
-        // if(filename.includes('default')) {
-        //     console.log('code gen', code)
-        //     // return;
-        // }
+        // console.log('map', map)
+
+        this.sourceToFile = map;
 
         return {
             id,
