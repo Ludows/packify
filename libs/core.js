@@ -71,10 +71,10 @@ class Core {
       this.Queue[file.src] = file
     } else {
       // Todo cas de l'update
-      this.Queue[file.src].content = file.content;
+      this.Queue[file.src].content = Buffer.from(file.content,'utf-8');
 
       if(this.Queue[file.src].map && file.map) {
-        this.Queue[file.src].map = file.map;
+        this.Queue[file.src].map = Buffer.from(file.map,'utf-8');
       }
     }
 

@@ -13,6 +13,11 @@ const {
 // a améliorer
 const path = require('path');
 const fs = require('fs');
+const util = require('util');
+const { stream, Readable , Writable, pipeline } = require('stream')
+
+// console.log(pipeline)
+
 
 const Table = require('tty-table')
 
@@ -123,28 +128,33 @@ class Exporter {
     return hash;
   }
   async createStreamableProcess(file, urlDest) {
+
+    let pipelineFiles = util.promisify(pipeline)
+
       if (fs.existsSync(path.dirname(urlDest)) == false) {
-        fs.mkdirSync(path.dirname(urlDest), {
+        await fs.promises.mkdir(path.dirname(urlDest), {
           recursive: true
         })
       }
 
-      if (fs.existsSync(urlDest) == false) {
-        fs.writeFileSync(urlDest, file.content.toString())
-      } else {
-        fs.writeFileSync(urlDest, '')
-        fs.writeFileSync(urlDest, file.content.toString())
+      if (fs.existsSync(urlDest)) {
+        await fs.promises.unlink(urlDest);
       }
+
+      const readableFile = Readable.from(file.content.toString());
+      const writeFileStreamExport = fs.createWriteStream(urlDest);
+      await pipelineFiles(readableFile, writeFileStreamExport)
 
       let urlDestMap = urlDest+".map";
-      if (fs.existsSync(urlDestMap) == false) {
-        fs.writeFileSync(urlDestMap, file.map.toString())
-      } else {
-        fs.writeFileSync(urlDestMap, '')
-        fs.writeFileSync(urlDestMap, file.map.toString())
+      if (fs.existsSync(urlDestMap)) {
+        await fs.promises.unlink(urlDestMap);
       }
 
-  
+      if(file.map) {
+        const readableFileMap = Readable.from(file.map.toString());
+        const writeFileStreamExportMap = fs.createWriteStream(urlDestMap);
+        await pipelineFiles(readableFileMap, writeFileStreamExportMap);
+      }
   }
   async getUrlDest(file, optionsOutput) {
     let skippingPartsUrl = optionsOutput.pathsFragmentSkipping
