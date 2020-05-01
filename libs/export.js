@@ -37,75 +37,18 @@ class Exporter {
       return await this.$runFileProcess(this.Compiler.Queue[file]);
     });
 
+    let results = undefined;
+
     try {
       
-      var results = await Promise.all( all_promesses );
-
-      let header = [];
-      let headers_table = [
-        "Source File",
-        "Output file",
-        "Hash"
-      ]
-
-      for (let index = 0; index < headers_table.length; index++) {
-        const type = headers_table[index];
-
-        if(type.toLowerCase() === "hash" && !this.Compiler.options.output.hash) {
-          break;
-        }
-        header.push({
-          value: type,
-          headerColor: "green",
-          width: this.Compiler.options.output.hash ? "33%" : "50%"
-        })
-
-      }
-
-      const options = {
-        headerAlign: "left",
-        align: "left",
-        color: "green",
-        truncate: false,
-        width: "100%",
-        compact: false,
-        borderColor: 'green'
-      }
-
-      let rows = []
-      
-      results.forEach((result) => {
-        let line_row = [];
-        let keysResult = Object.keys(result);
-        
-        keysResult.forEach((key) => {
-          line_row.push(result[key]);
-        })
-        
-        rows.push(line_row);
-      })
-
-      await this.Compiler.Hookable.callHook('end', results, this.Compiler);
-      // console.log('after end hook')
-      await this.Compiler.Hookable.callHook('mdasset', results, this.Compiler);
-      // console.log('after mdasset hook')
-      this.Compiler.spinnies.succeed('export', { text: 'Export success !' });
-
-      this.Compiler.spinnies.remove('export')
-
-      // console.log('header', header)
-      // console.log('rows', rows)
-      // console.log('options', options)
-      var end = Date.now();
-      const out = Table(header,rows,options).render();
-
-      console.log('Process executed in '+ ( end - this.Compiler.Start ) +' ms')
-      console.log(out)
+      results = await Promise.all( all_promesses );
 
     } catch (error) {
       console.log('error', error)
       makeError('Unable to create files', error)
     }
+
+    return results;
     
   }
   async $runFileProcess(element) {

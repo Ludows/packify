@@ -15,6 +15,7 @@ const {
 } = require('./helpers');
 
 const Exporter = require('@ludoows/packify/libs/export');
+const TablePrinter = require('@ludoows/packify/libs/outputsTable');
 
 const MyHookable = require('@ludoows/packify/libs/hookable');
 
@@ -410,11 +411,12 @@ class Core {
 
     let Export = new Exporter(this);
     // console.log('after instance export');
+    let stats = undefined;
     try {
-      let stats = await Export.run();
+      stats = await Export.run();
     } catch (error) {
       // console.log('exporter error', error)
-      makeError('Export can not work.');
+      makeError('Export can not work.', error);
     }
 
     
@@ -465,6 +467,19 @@ class Core {
     await this.managePlugins();
     await this.$init();
     let Stats = await this.$runtimeExport();
+
+    await this.Hookable.callHook('end', Stats, this);
+    // console.log('after end hook')
+    await this.Hookable.callHook('mdasset', Stats, this);
+    // console.log('after mdasset hook')
+    this.spinnies.succeed('export', { text: 'Export success !' });
+    this.spinnies.remove('export')
+
+    let MyTable = new TablePrinter(this, Stats);
+    console.log('MyTable')
+
+    process.env.NODE_ENV === 'development' ? MyTable.render() : ''
+
     return Stats;
   }
 }
