@@ -31,6 +31,8 @@ async function MdAssetFunction(...args) {
         let fileType = getFileType(key);
         let fileName = getFileName(key);
 
+        fileName = fileName.replace('.'+fileType, '');
+
         if(fileName.indexOf('.min') > - 1) {
             // ca existe et on s'en bat la bite des .min
             fileName = fileName.replace('.min', '');
