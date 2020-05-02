@@ -1,17 +1,17 @@
 class CacheCompiler {
     constructor() {
-        this.cache = {};
+        this.stack = {};
     }
     get(key) {
-        return this.cache[key];
+        return this.stack[key];
     }
     set(key, value) {
-        this.cache[key] = value;
+        this.stack[key] = value;
         return this;
     }
     isCached(key) {
         let ret = false;
-        if(this.cache[key] != undefined) {
+        if(this.stack[key] != undefined) {
             ret = true;
         }
         return ret;

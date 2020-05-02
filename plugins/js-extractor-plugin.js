@@ -16,6 +16,10 @@ const types = require("@babel/types"); // types for traversing ast
 
 const crypto = require("crypto");
 
+const CacheCompiler = require('@ludoows/packify/libs/cacheCompiler');
+
+const cache = new CacheCompiler();
+
 // console.log('types', types)
 
 
@@ -23,6 +27,7 @@ class JsExtractorPlugin extends PluginBase {
     constructor(...args) {
         super(args[0], args[1], args[2])
         this.sourceToFile = null;
+        this.Cache = cache;
         // this.deps = getListingDependenciesProject()
     }
     getDefaults() {
@@ -80,107 +85,124 @@ class JsExtractorPlugin extends PluginBase {
             sourceType: "module"
         });
 
+        const id = await this.generateUniqId();
         // if(filename.includes('default')) {
         //     console.log(ast)
         // }
 
-        let dependencies = [];
-        console.log('file before traverse', filename)
-        traverse(ast, {
-            ExpressionStatement: (path) => {
-
-                // test pour ce cas de figure => let a = require('tata');
-
-
-                // if(filename.includes('default')) {
-
-                    // test pour ce cas de figure => let a = require('tata');
-                    if(types.isAssignmentExpression(path.node.expression, { operator: "=" })) {
-                        
-                        if( path.node.expression.hasOwnProperty('right') && 
-                        types.isCallExpression(path.node.expression.right) &&
-                        !types.isFunctionExpression(path.node.expression) ) {
-                            // console.log('from isCallExpression', path.node.expression.right)
-
-                            if(path.node.expression.right.callee.hasOwnProperty('name') &&
-                              path.node.expression.right.callee.name === "require"
-                            ) {
-                                dependencies.push(path.node.expression.right.arguments[0].value);
-                            }
-
-                        }
-
-                        // test pour ce cas de figure => window.a =  window.b = require('tata');
-                        if(types.isAssignmentExpression(path.node.expression.right, { operator: "=" })) {
-                            // console.log('log', path.node.expression.right.right)
-                            if( path.node.expression.right.right.hasOwnProperty('callee') &&
-                                path.node.expression.right.right.callee.name === "require") {
-
-                                // console.log('arguments ?', path.node.expression.right.right.arguments[0])
-                                dependencies.push(path.node.expression.right.right.arguments[0].value);
-                            }
-                            
-                        }
-                    }
-
-                    // Le cas le plus classique => require('tata')
-                    if(types.isCallExpression(path.node.expression) && 
-                    path.node.expression.callee.hasOwnProperty('name') &&
-                    path.node.expression.callee.name === "require") {
-                        // console.log('isCallExpression basic', path.node.expression.arguments[0].value)
-                        dependencies.push(path.node.expression.arguments[0].value);
-                    }
-
-                //     throw 'throw pour debug babel'
-                //  }
-                
-            },
-            VariableDeclaration: (path) => {
-                if(types.isCallExpression(path.node.declarations[0].init)) {
-                    // Correspond au cas du => let a = require('dt')
-                    if(path.node.declarations[0].init.callee.name === "require") {
-                        // console.log('log ???', path.node.declarations[0].init.arguments[0])
-                        dependencies.push(path.node.declarations[0].init.arguments[0].value);
-                    }
-                    
-                }
-            },
-            ImportDeclaration: ({
-                node
-            }) => {
-                dependencies.push(node.source.value);
-            }
-        });
         
-        dependencies = dependencies.filter((dep) => {
-            return dep != null && dep != "";
-        })
-        console.log('dependencies after clean', dependencies)
-        const id = await this.generateUniqId();
-        
-        
-        // console.log('after up', this.ID)
-        // console.log('after file', filename)
-        
-        if(this.options.sourceMaps == true) {
-            this.options.sourceFileName = filename;
+        // console.log('file before traverse', filename)
+
+        if(this.Cache.isCached(filename)) {
+            console.log('loaded from cache', filename)
+            let CacheFileObject = this.Cache.get(filename);
+            return CacheFileObject;
         }
+        else {
+            let dependencies = [];
+            console.log('compilation', filename)
+            traverse(ast, {
+                ExpressionStatement: (path) => {
+    
+                    // test pour ce cas de figure => let a = require('tata');
+    
+    
+                    // if(filename.includes('default')) {
+    
+                        // test pour ce cas de figure => let a = require('tata');
+                        if(types.isAssignmentExpression(path.node.expression, { operator: "=" })) {
+                            
+                            if( path.node.expression.hasOwnProperty('right') && 
+                            types.isCallExpression(path.node.expression.right) &&
+                            !types.isFunctionExpression(path.node.expression) ) {
+                                // console.log('from isCallExpression', path.node.expression.right)
+    
+                                if(path.node.expression.right.callee.hasOwnProperty('name') &&
+                                  path.node.expression.right.callee.name === "require"
+                                ) {
+                                    dependencies.push(path.node.expression.right.arguments[0].value);
+                                }
+    
+                            }
+    
+                            // test pour ce cas de figure => window.a =  window.b = require('tata');
+                            if(types.isAssignmentExpression(path.node.expression.right, { operator: "=" })) {
+                                // console.log('log', path.node.expression.right.right)
+                                if( path.node.expression.right.right.hasOwnProperty('callee') &&
+                                    path.node.expression.right.right.callee.name === "require") {
+    
+                                    // console.log('arguments ?', path.node.expression.right.right.arguments[0])
+                                    dependencies.push(path.node.expression.right.right.arguments[0].value);
+                                }
+                                
+                            }
+                        }
+    
+                        // Le cas le plus classique => require('tata')
+                        if(types.isCallExpression(path.node.expression) && 
+                        path.node.expression.callee.hasOwnProperty('name') &&
+                        path.node.expression.callee.name === "require") {
+                            // console.log('isCallExpression basic', path.node.expression.arguments[0].value)
+                            dependencies.push(path.node.expression.arguments[0].value);
+                        }
+    
+                    //     throw 'throw pour debug babel'
+                    //  }
+                    
+                },
+                VariableDeclaration: (path) => {
+                    if(types.isCallExpression(path.node.declarations[0].init)) {
+                        // Correspond au cas du => let a = require('dt')
+                        if(path.node.declarations[0].init.callee.name === "require") {
+                            // console.log('log ???', path.node.declarations[0].init.arguments[0])
+                            dependencies.push(path.node.declarations[0].init.arguments[0].value);
+                        }
+                        
+                    }
+                },
+                ImportDeclaration: ({
+                    node
+                }) => {
+                    dependencies.push(node.source.value);
+                }
+            });
+            
+            dependencies = dependencies.filter((dep) => {
+                return dep != null && dep != "";
+            })
+            // console.log('dependencies after clean', dependencies)
+            
+            
+            // console.log('after up', this.ID)
+            // console.log('after file', filename)
+            
+            if(this.options.sourceMaps == true) {
+                this.options.sourceFileName = filename;
+            }
+    
+            const {
+                code,
+                map
+            } = await babel.transformFromAstAsync(ast, null, this.options);
+    
+            // console.log('map', map)
+    
+            this.sourceToFile = JSON.stringify(map); 
 
-        const {
-            code,
-            map
-        } = await babel.transformFromAstAsync(ast, null, this.options);
+            this.Cache.set(filename, {
+                id,
+                filename,
+                dependencies,
+                code
+            })
 
-        // console.log('map', map)
-
-        this.sourceToFile = JSON.stringify(map);
-
-        return {
-            id,
-            filename,
-            dependencies,
-            code
-        };
+            return {
+                id,
+                filename,
+                dependencies,
+                code
+            };
+        }    
     }
     async createGraph(entry) {
         const mainAsset = await this.createAsset(entry);
