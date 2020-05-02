@@ -47,7 +47,7 @@ async function MdAssetFunction(...args) {
             let bindingKey = undefined;
 
             if(getTypeFolderConfiguration != null) {
-                bindingKey = getTypeFolderConfiguration+'.'+fileType+'.'+fileName
+                bindingKey = fileType+'.'+getTypeFolderConfiguration+'.'+fileName
             }
             else {
                 bindingKey = fileType+'.'+fileName

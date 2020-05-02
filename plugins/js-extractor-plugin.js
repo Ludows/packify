@@ -11,9 +11,12 @@ const {
 
 const parser = require("@babel/parser"); // parses and returns AST
 const traverse = require("@babel/traverse").default; // walks through AST
-const babel = require("@babel/core"); // main babel functionality
+const babel = require("@babel/core");
+const types = require("@babel/types"); // types for traversing ast
 
 const crypto = require("crypto");
+
+// console.log('types', types)
 
 
 class JsExtractorPlugin extends PluginBase {
@@ -77,15 +80,84 @@ class JsExtractorPlugin extends PluginBase {
             sourceType: "module"
         });
 
-        const dependencies = [];
+        // if(filename.includes('default')) {
+        //     console.log(ast)
+        // }
+
+        let dependencies = [];
+        console.log('file before traverse', filename)
         traverse(ast, {
+            ExpressionStatement: (path) => {
+
+                // test pour ce cas de figure => let a = require('tata');
+
+
+                // if(filename.includes('default')) {
+
+                    // test pour ce cas de figure => let a = require('tata');
+                    if(types.isAssignmentExpression(path.node.expression, { operator: "=" })) {
+                        
+                        if( path.node.expression.hasOwnProperty('right') && 
+                        types.isCallExpression(path.node.expression.right) &&
+                        !types.isFunctionExpression(path.node.expression) ) {
+                            // console.log('from isCallExpression', path.node.expression.right)
+
+                            if(path.node.expression.right.callee.hasOwnProperty('name') &&
+                              path.node.expression.right.callee.name === "require"
+                            ) {
+                                dependencies.push(path.node.expression.right.arguments[0].value);
+                            }
+
+                        }
+
+                        // test pour ce cas de figure => window.a =  window.b = require('tata');
+                        if(types.isAssignmentExpression(path.node.expression.right, { operator: "=" })) {
+                            // console.log('log', path.node.expression.right.right)
+                            if( path.node.expression.right.right.hasOwnProperty('callee') &&
+                                path.node.expression.right.right.callee.name === "require") {
+
+                                // console.log('arguments ?', path.node.expression.right.right.arguments[0])
+                                dependencies.push(path.node.expression.right.right.arguments[0].value);
+                            }
+                            
+                        }
+                    }
+
+                    // Le cas le plus classique => require('tata')
+                    if(types.isCallExpression(path.node.expression) && 
+                    path.node.expression.callee.hasOwnProperty('name') &&
+                    path.node.expression.callee.name === "require") {
+                        // console.log('isCallExpression basic', path.node.expression.arguments[0].value)
+                        dependencies.push(path.node.expression.arguments[0].value);
+                    }
+
+                //     throw 'throw pour debug babel'
+                //  }
+                
+            },
+            VariableDeclaration: (path) => {
+                if(types.isCallExpression(path.node.declarations[0].init)) {
+                    // Correspond au cas du => let a = require('dt')
+                    if(path.node.declarations[0].init.callee.name === "require") {
+                        // console.log('log ???', path.node.declarations[0].init.arguments[0])
+                        dependencies.push(path.node.declarations[0].init.arguments[0].value);
+                    }
+                    
+                }
+            },
             ImportDeclaration: ({
                 node
             }) => {
                 dependencies.push(node.source.value);
             }
         });
+        
+        dependencies = dependencies.filter((dep) => {
+            return dep != null && dep != "";
+        })
+        console.log('dependencies after clean', dependencies)
         const id = await this.generateUniqId();
+        
         
         // console.log('after up', this.ID)
         // console.log('after file', filename)
@@ -186,9 +258,8 @@ class JsExtractorPlugin extends PluginBase {
                 else {
                     formaterId.push(moduleIds);
                 }
-                for (var i = 0; i < formaterId.length; i++) {
-                    require(formaterId[i]);
-                }
+                
+                require(formaterId[0]);
                 })({${modules}})
             `;
 

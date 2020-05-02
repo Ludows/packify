@@ -13,7 +13,7 @@ const BasePackifyConfig = {
     },
     plugins: [
         ['js-extractor-plugin', {
-            presets: ['env']
+            presets: ['@babel/preset-env']
         }],
         ['sass-plugin', {}],
         ['postcss-plugin', {
