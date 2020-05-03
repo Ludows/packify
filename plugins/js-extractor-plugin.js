@@ -20,6 +20,7 @@ const CacheCompiler = require('@ludoows/packify/libs/cacheCompiler');
 
 const cache = new CacheCompiler();
 
+
 // console.log('types', types)
 
 
@@ -28,6 +29,7 @@ class JsExtractorPlugin extends PluginBase {
         super(args[0], args[1], args[2])
         this.sourceToFile = null;
         this.Cache = cache;
+        this.CallStackPlaceholders = {};
         // this.deps = getListingDependenciesProject()
     }
     getDefaults() {
@@ -55,7 +57,7 @@ class JsExtractorPlugin extends PluginBase {
             let bundle = await this.bundle(graph);
             // console.log('after bundle')
 
-            // console.log('bundle', bundle)
+            // console.log('this.Cache', this.Cache)
 
             return {
                 src: file.src,
@@ -72,6 +74,14 @@ class JsExtractorPlugin extends PluginBase {
         const id = crypto.randomBytes(3).toString("hex");
         // console.log('id', id)
         return id;
+    }
+    generateSlugPlaceholder(string) {
+        return slugify('packify-placeholder-'+string, {
+            replacement: '-',  // replace spaces with replacement character, defaults to `-`
+            remove: /[*+~.()/'"!:@]/g, // remove characters that match regex, defaults to `undefined`
+            lower: false,      // convert to lower case, defaults to `false`
+            strict: true,     // strip special characters except replacement, defaults to `false`
+        })
     }
     // async parse() {
 
@@ -90,17 +100,21 @@ class JsExtractorPlugin extends PluginBase {
         //     console.log(ast)
         // }
 
+        const self = this;
+
         
-        // console.log('file before traverse', filename)
+        console.log('file passed', filename)
 
         if(this.Cache.isCached(filename)) {
-            console.log('loaded from cache', filename)
+            // console.log('loaded from cache', filename)
             let CacheFileObject = this.Cache.get(filename);
             return CacheFileObject;
         }
         else {
             let dependencies = [];
-            console.log('compilation', filename)
+            let placeholder;
+            // console.log('compilation', filename)
+            self.CallStackPlaceholders[filename] = [];
             traverse(ast, {
                 ExpressionStatement: (path) => {
     
@@ -121,6 +135,17 @@ class JsExtractorPlugin extends PluginBase {
                                   path.node.expression.right.callee.name === "require"
                                 ) {
                                     dependencies.push(path.node.expression.right.arguments[0].value);
+                                    // path.node.expression.right.arguments[0].value = "grosse-tata";
+                                    // console.log('testurlSlug', testurlSlug)
+                                    self.CallStackPlaceholders[filename].push({
+                                        expression: path.node.expression.right.arguments[0].value,
+                                        file: filename,
+                                        start: path.node.expression.right.arguments[0].start,
+                                        end: path.node.expression.right.arguments[0].end,
+                                        require: true,
+                                        import: false
+                                    })
+
                                 }
     
                             }
@@ -133,6 +158,15 @@ class JsExtractorPlugin extends PluginBase {
     
                                     // console.log('arguments ?', path.node.expression.right.right.arguments[0])
                                     dependencies.push(path.node.expression.right.right.arguments[0].value);
+                                    // console.log('testurlSlug', testurlSlug)
+                                    self.CallStackPlaceholders[filename].push({
+                                        expression: path.node.expression.right.right.arguments[0].value,
+                                        file: filename,
+                                        start: path.node.expression.right.right.arguments[0].start,
+                                        end: path.node.expression.right.right.arguments[0].end,
+                                        require: true,
+                                        import: false
+                                    })
                                 }
                                 
                             }
@@ -144,6 +178,16 @@ class JsExtractorPlugin extends PluginBase {
                         path.node.expression.callee.name === "require") {
                             // console.log('isCallExpression basic', path.node.expression.arguments[0].value)
                             dependencies.push(path.node.expression.arguments[0].value);
+                            // path.node.expression.arguments[0].value = "grosse-tata-3"
+                            // console.log('testurlSlug', testurlSlug)
+                            self.CallStackPlaceholders[filename].push({
+                                expression: path.node.expression.arguments[0].value,
+                                file: filename,
+                                start: path.node.expression.arguments[0].start,
+                                end: path.node.expression.arguments[0].end,
+                                require: true,
+                                import: false
+                            })
                         }
     
                     //     throw 'throw pour debug babel'
@@ -156,6 +200,17 @@ class JsExtractorPlugin extends PluginBase {
                         if(path.node.declarations[0].init.callee.name === "require") {
                             // console.log('log ???', path.node.declarations[0].init.arguments[0])
                             dependencies.push(path.node.declarations[0].init.arguments[0].value);
+                            // path.node.declarations[0].init.arguments[0].value = "grosse-tata-4"
+                            let testurlSlug = self.generateSlugPlaceholder(path.node.declarations[0].init.arguments[0].value);
+                            self.CallStackPlaceholders[filename].push({
+                                expression: path.node.declarations[0].init.arguments[0].value,
+                                file: filename,
+                                start: path.node.declarations[0].init.arguments[0].start,
+                                end: path.node.declarations[0].init.arguments[0].end,
+                                require: true,
+                                import: false
+                            })
+                            // console.log('testurlSlug', testurlSlug)
                         }
                         
                     }
@@ -170,37 +225,41 @@ class JsExtractorPlugin extends PluginBase {
             dependencies = dependencies.filter((dep) => {
                 return dep != null && dep != "";
             })
-            // console.log('dependencies after clean', dependencies)
             
             
+            
+            
+
             // console.log('after up', this.ID)
             // console.log('after file', filename)
             
-            if(this.options.sourceMaps == true) {
-                this.options.sourceFileName = filename;
-            }
+            // if(this.options.sourceMaps == true) {
+            //     this.options.sourceFileName = filename;
+            // }
     
-            const {
-                code,
-                map
-            } = await babel.transformFromAstAsync(ast, null, this.options);
+            // const {
+            //     code,
+            //     map
+            // } = await babel.transformFromAstAsync(ast, null, this.options);
     
-            // console.log('map', map)
+            // // console.log('map', map)
     
-            this.sourceToFile = JSON.stringify(map); 
+            // this.sourceToFile = JSON.stringify(map); 
 
             this.Cache.set(filename, {
                 id,
                 filename,
                 dependencies,
-                code
+                source: content,
+                // code
             })
 
             return {
                 id,
                 filename,
                 dependencies,
-                code
+                source: content,
+                // code
             };
         }    
     }
@@ -217,13 +276,72 @@ class JsExtractorPlugin extends PluginBase {
             // console.log('have dependencies ?', asset.dependencies);
             let dependencies_promesses = asset.dependencies.map(async (relativePath) => { return this.mergingDeps(relativePath, queue, asset, dirname) });
 
-            // console.log('dependencies_promesses', dependencies_promesses)
-
             let Results = await Promise.all( dependencies_promesses )
 
-            // console.log('Results', Results)
         }
+
+        await this.sourceStringReplacer(queue)
+       
         return queue;
+    }
+    async CompileCodeSnippets(assetObject) {
+
+        // console.log('this call stack', this.CallStackPlaceholders[assetObject.filename])
+        let havePlaceholders = this.CallStackPlaceholders[assetObject.filename];
+
+        let source =  assetObject.source.toString();
+
+        if(havePlaceholders.length > 0) {
+            
+            havePlaceholders.forEach((placeholder) => {
+                // let cacheIdModule = this.Cache.get(placeholder.file);
+                source = source.replace('require(\''+placeholder.expression+'\')', 'require(\''+assetObject.mapping[placeholder.expression]+'\')')
+                if(assetObject.filename.includes('default')) {
+                    console.log(placeholder.expression, assetObject.mapping[placeholder.expression])
+
+                }
+            })
+            // if(assetObject.filename.includes('default')) {
+            //     console.log('source', source)
+
+            //     // console.log('mapping ?', assetObject)
+
+            //     throw 'stop'
+            // }
+            // source = source.replace(source)
+            
+            // throw 'stop'
+        }
+        
+        if(this.options.sourceMaps == true) {
+            this.options.sourceFileName = getFileName(assetObject.filename);
+        }
+
+        const {
+            code,
+            map
+        } = await babel.transformAsync(source, this.options);
+
+
+        this.sourceToFile = JSON.stringify(map);
+
+        assetObject.code = code;
+        
+        return 'ok';
+    }
+    async sourceStringReplacer(queueArray) {
+
+        // for (const asset of queueArray) {
+        //     // console.log('string replacer ?', asset)
+        //     // console.log('source before transforms ?', asset.source.toString())
+            
+        //     // console.log('source after transforms ?', asset.source)
+        // }
+
+        let queue_promises = queueArray.map( async (assetObject) => { return await this.CompileCodeSnippets(assetObject) })
+
+        let resultsCompilationCode = await Promise.all( queue_promises );
+        
     }
     async mergingDeps(relativePath, queue, asset, dirname) {
         let typedModule = typeOfModule(relativePath)
