@@ -75,17 +75,6 @@ class JsExtractorPlugin extends PluginBase {
         // console.log('id', id)
         return id;
     }
-    generateSlugPlaceholder(string) {
-        return slugify('packify-placeholder-'+string, {
-            replacement: '-',  // replace spaces with replacement character, defaults to `-`
-            remove: /[*+~.()/'"!:@]/g, // remove characters that match regex, defaults to `undefined`
-            lower: false,      // convert to lower case, defaults to `false`
-            strict: true,     // strip special characters except replacement, defaults to `false`
-        })
-    }
-    // async parse() {
-
-    // }
     async createAsset(filename) {
         let content = await readFile(filename);
 
@@ -201,7 +190,7 @@ class JsExtractorPlugin extends PluginBase {
                             // console.log('log ???', path.node.declarations[0].init.arguments[0])
                             dependencies.push(path.node.declarations[0].init.arguments[0].value);
                             // path.node.declarations[0].init.arguments[0].value = "grosse-tata-4"
-                            let testurlSlug = self.generateSlugPlaceholder(path.node.declarations[0].init.arguments[0].value);
+                            // let testurlSlug = self.generateSlugPlaceholder(path.node.declarations[0].init.arguments[0].value);
                             self.CallStackPlaceholders[filename].push({
                                 expression: path.node.declarations[0].init.arguments[0].value,
                                 file: filename,
