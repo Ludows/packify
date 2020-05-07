@@ -31,6 +31,8 @@
     "hookable": "^4.1.0",
     "terser": "^4.6.12",
     "spinnies": "^0.5.1",
-    "tty-table": "^4.1.1"
+    "tty-table": "^4.1.1",
+    "detective": "^5.2.0",
+    "detective-module": "^2.0.0"
   }
 }

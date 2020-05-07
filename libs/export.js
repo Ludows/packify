@@ -18,9 +18,6 @@ const { stream, Readable , Writable, pipeline } = require('stream')
 
 // console.log(pipeline)
 
-
-const Table = require('tty-table')
-
 class Exporter {
   constructor(...args) {
     this.Compiler = args[0];

@@ -337,7 +337,7 @@ class Core {
         this.queue(fetchResp);
         return fetchResp;
       } catch (error) {
-        // console.log(error)
+        console.log(error)
         makeError('Unable to run task', error)
       }      
   }
